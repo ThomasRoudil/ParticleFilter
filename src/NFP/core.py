@@ -10,4 +10,4 @@ def generate_trajectory():
     x[0, 1] = 500
     for t in time:
         x[t, :] = x[t - 1, :] + [v0, 0]
-    return x
+    return list(x)

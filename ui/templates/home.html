@@ -25,7 +25,7 @@
                 var filename = $(this).val();
 
                 $.ajax({
-                    url: "/get-trajectory/" + filename,
+                    url: "/get-trajectory",
                     success: function(response) {
                         console.log(response)
                     }
