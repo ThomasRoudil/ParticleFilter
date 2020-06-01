@@ -1,45 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>NPF - Neural particle filter</title>
-            <script src="https://code.jquery.com/jquery-3.5.1.min.js"
-        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
-        crossorigin="anonymous"></script>
+<head>
+    <meta charset="UTF-8">
+    <title>NPF - Neural particle filter</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/inspector/babylon.inspector.bundle.js"></script>
+    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+    <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+    <script src="https://cdn.babylonjs.com/postProcessesLibrary/babylonjs.postProcess.min.js"></script>
+    <script src="https://cdn.babylonjs.com/gui/babylon.gui.min.js"></script>
+    <script src="https://cdn.babylonjs.com/proceduralTexturesLibrary/babylonjs.proceduralTextures.min.js"></script>
+    <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
     <script type="text/javascript">
-        $(function() {
+        function drawMap(path) {
+            var canvas = document.getElementById("renderCanvas");
+            var engine = new BABYLON.Engine(canvas, true);
+            var sunPos = 0;
+            var radius = 50;
+
+            var createScene = function () {
+                var scene = new BABYLON.Scene(engine);
+
+                // Light
+                var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 30, 10), scene);
+                spot.diffuse = new BABYLON.Color3(1, 1, 1);
+                spot.specular = new BABYLON.Color3(0, 0, 0);
+
+                // Camera
+                var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 100, BABYLON.Vector3.Zero(), scene);
+                camera.lowerBetaLimit = 0.1;
+                camera.upperBetaLimit = (Math.PI / 2) * 0.9;
+                camera.lowerRadiusLimit = 30;
+                camera.upperRadiusLimit = 150;
+                camera.attachControl(canvas, true);
+
+                // Ground
+                var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
+                groundMaterial.diffuseTexture = new BABYLON.Texture(path, scene);
+
+                var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 200, 200, 250, 0, 3, scene, false);
+                ground.material = groundMaterial;
+
+                //Sphere to see the light's position
+                var sun = BABYLON.Mesh.CreateSphere("sun", 10, 4, scene);
+                sun.material = new BABYLON.StandardMaterial("sun", scene);
+                sun.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
+
+                // Skybox
+                var skybox = BABYLON.Mesh.CreateBox("skyBox", 800.0, scene);
+                var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+                skyboxMaterial.backFaceCulling = false;
+                skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", scene);
+                skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+                skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+                skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+                skyboxMaterial.disableLighting = true;
+                skybox.material = skyboxMaterial;
+
+                //Sun animation
+                scene.registerBeforeRender(function () {
+                    sun.position = spot.position;
+                    spot.position.x = radius * Math.cos(sunPos);
+                    spot.position.z = radius * Math.sin(sunPos);
+                    sunPos += 0.01;
+                });
+
+                return scene;
+            }
+
+            var scene = createScene();
+            engine.runRenderLoop(function () {
+                scene.render();
+            });
+
+            window.addEventListener("resize", function () {
+                engine.resize();
+            });
+        }
+
+        $(function () {
 
             // Requête GET vers l'url 'get-dem-paths'
             $.ajax({
                 url: "/get-dem-paths",
-                success: function(response) {
+                success: function (response) {
                     var paths = JSON.parse(response);
-                    paths.map(function(path) {
+                    paths.map(function (path) {
                         $('select').append('<option>' + path + '</option>');
                     });
 
                 }
             });
 
-            $('select').on('change', function() {
+            $('select').on('change', function () {
                 var filename = $(this).val();
+                var path = "/get-dem/" + filename
 
                 $.ajax({
                     url: "/get-trajectory",
-                    success: function(response) {
+                    success: function (response) {
                         console.log(response)
                     }
                 });
 
-                $('img').attr('src', "/get-dem/" + filename);
-            })
+                $('img').attr('src', path);
 
+                drawMap(path);
+            });
         });
     </script>
 
-    </head>
-    <body>
-        <select></select>
-        <img src="" alt="heightmap" width="300" height="300"/>
-    </body>
+</head>
+<body>
+<select></select>
+<img src="" alt="heightmap" width="300" height="300"/>
+<canvas id="renderCanvas" touch-action="none"></canvas>
+</body>
 </html>
