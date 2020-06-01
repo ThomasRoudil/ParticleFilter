@@ -8,16 +8,16 @@ function drawMap(path) {
         var scene = new BABYLON.Scene(engine);
 
         // Light
-        var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 30, 10), scene);
+        var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 100, 45), scene);
         spot.diffuse = new BABYLON.Color3(1, 1, 1);
         spot.specular = new BABYLON.Color3(0, 0, 0);
-        spot.intensity = 2;
+        spot.intensity = 0.7;
 
         // Camera
         var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 100, BABYLON.Vector3.Zero(), scene);
         camera.lowerBetaLimit = 0.1;
         camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-        camera.lowerRadiusLimit = 30;
+        camera.lowerRadiusLimit = 1000;
         camera.upperRadiusLimit = 1500;
         camera.attachControl(canvas, true);
 
@@ -37,7 +37,7 @@ function drawMap(path) {
             sun.position = spot.position;
             spot.position.x = radius * Math.cos(sunPos);
             spot.position.z = radius * Math.sin(sunPos);
-            sunPos += 0.1;
+            sunPos += 0.01;
         });
 
         return scene;
