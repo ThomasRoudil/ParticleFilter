@@ -1,10 +1,10 @@
 import json
-import numpy as np
 import os
 from NFP import core
 from config import Config
 from flask import Flask, render_template, send_file
 
+core.generate_heightmaps()
 app = Flask(__name__, template_folder=os.path.abspath('../ui/templates'))
 
 
@@ -15,7 +15,7 @@ def home():
 
 @app.route('/get-dem-paths')
 def get_dem_paths():
-    return json.dumps(Config.DEM_PATHS)
+    return json.dumps(Config.DEM_FILENAMES)
 
 
 @app.route('/get-trajectory')
@@ -27,7 +27,6 @@ def get_trajectory():
 @app.route('/get-dem/<filename>')
 def get_dem(filename):
     dem_path = os.path.join(Config.DB_PATH, filename)
-    np.loadtxt(dem_path)
     return send_file(dem_path)
 
 
