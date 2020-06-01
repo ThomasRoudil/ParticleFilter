@@ -6,4 +6,4 @@ class Config:
     DB_PATH = os.path.join(NFP_PATH, 'db')
     UI_PATH = os.path.join(NFP_PATH, 'ui')
 
-    DEM_FILES = os.listdir(DB_PATH)
+    DEM_PATHS = os.listdir(DB_PATH)
