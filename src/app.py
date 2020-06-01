@@ -23,4 +23,10 @@ def get_trajectory():
     return json.dumps([(d[0], d[1]) for d in trajectory])
 
 
+@app.route('/get-dem/<filename>')
+def get_dem(filename):
+    dem_path = os.path.join(Config.DB_PATH, filename)
+    return json.dumps(Config.DB_PATH)
+
+
 app.run(host='127.0.0.1', port=3000, debug=True)
