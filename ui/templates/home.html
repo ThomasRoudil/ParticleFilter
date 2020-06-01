@@ -30,6 +30,13 @@
                         console.log(response)
                     }
                 });
+
+                $.ajax({
+                    url: "/get-dem/" + filename,
+                    success: function(response) {
+                        console.log(response)
+                    }
+                });
             })
 
         });
