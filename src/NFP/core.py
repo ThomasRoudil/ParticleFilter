@@ -11,3 +11,4 @@ def generate_trajectory():
     for t in time:
         x[t, :] = x[t - 1, :] + [v0, 0]
     return list(x)
+
