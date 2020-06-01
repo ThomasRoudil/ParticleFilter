@@ -20,10 +20,10 @@ def get_dem_paths():
 @app.route('/get-trajectory/<filename>')
 def get_trajectory(filename):
     try:
-        trajectory = core.generate_trajectory(filename)
+        trajectory = core.generate_trajectory()
     except OSError:
         return f'File {filename} cannot be found', 404
-    return json.dumps(trajectory)
+    return json.dumps([(d[0], d[1]) for d in trajectory])
 
 
 app.run(host='127.0.0.1', port=3000, debug=True)
