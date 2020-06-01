@@ -15,7 +15,7 @@ def home():
 
 @app.route('/get-dem-paths')
 def get_dem_paths():
-    return json.dumps(Config.DEM_FILENAMES)
+    return json.dumps(Config.HEIGHTMAPS_FILENAMES)
 
 
 @app.route('/get-trajectory')
@@ -26,7 +26,7 @@ def get_trajectory():
 
 @app.route('/get-dem/<filename>')
 def get_dem(filename):
-    dem_path = os.path.join(Config.DB_PATH, filename)
+    dem_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
     return send_file(dem_path)
 
 

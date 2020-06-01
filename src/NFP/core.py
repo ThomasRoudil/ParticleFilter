@@ -5,15 +5,14 @@ from config import Config
 
 
 def generate_heightmaps():
-    heightmaps_path = os.path.join(Config.DB_PATH, 'heightmaps')
-    if not os.path.exists(heightmaps_path):
-        os.makedirs(heightmaps_path)
-        for filename in Config.DEM_FILENAMES:
+    if not os.path.exists(Config.HEIGHTMAPS_PATH):
+        os.makedirs(Config.HEIGHTMAPS_PATH)
+        for filename in Config.HEIGHTMAPS_FILENAMES:
             if filename.endswith('.asc'):
                 dem_path = os.path.join(Config.DB_PATH, filename)
                 img = np.loadtxt(dem_path)
                 filename = filename.replace('.asc', Config.IMAGE_EXTENSION)
-                cv2.imwrite(os.path.join(heightmaps_path, filename), img)
+                cv2.imwrite(os.path.join(Config.HEIGHTMAPS_PATH, filename), img)
 
 
 def generate_trajectory():

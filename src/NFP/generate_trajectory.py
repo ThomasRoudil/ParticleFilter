@@ -4,7 +4,7 @@ from config import Config
 from scipy.ndimage.interpolation import map_coordinates
 
 index = 0
-dem_path = os.path.join(Config.DB_PATH, Config.DEM_FILENAMES[index])
+dem_path = os.path.join(Config.DB_PATH, Config.HEIGHTMAPS_FILENAMES[index])
 
 
 # mesures
