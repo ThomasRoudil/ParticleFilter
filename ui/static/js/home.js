@@ -2,7 +2,7 @@ function drawMap(path) {
     var canvas = document.getElementById("renderCanvas");
     var engine = new BABYLON.Engine(canvas, true);
     var sunPos = 0;
-    var radius = 50;
+    var radius = 200;
 
     var createScene = function () {
         var scene = new BABYLON.Scene(engine);
@@ -11,7 +11,7 @@ function drawMap(path) {
         var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 30, 10), scene);
         spot.diffuse = new BABYLON.Color3(1, 1, 1);
         spot.specular = new BABYLON.Color3(0, 0, 0);
-        spot.intensity = 1.5;
+        spot.intensity = 2;
 
         // Camera
         var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 100, BABYLON.Vector3.Zero(), scene);
@@ -23,9 +23,8 @@ function drawMap(path) {
 
         // Ground
         var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
-        groundMaterial.diffuseTexture = new BABYLON.Texture(path, scene);
 
-        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 250, 0, 50, scene, false);
+        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 250, 0, 100, scene, false);
         ground.material = groundMaterial;
 
         //Sphere to see the light's position
@@ -33,27 +32,16 @@ function drawMap(path) {
         sun.material = new BABYLON.StandardMaterial("sun", scene);
         sun.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
 
-        // Skybox
-        var skybox = BABYLON.Mesh.CreateBox("skyBox", 800.0, scene);
-        var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
-        skyboxMaterial.backFaceCulling = false;
-        skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("textures/skybox", scene);
-        skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
-        skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
-        skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
-        skyboxMaterial.disableLighting = true;
-        skybox.material = skyboxMaterial;
-
         //Sun animation
         scene.registerBeforeRender(function () {
             sun.position = spot.position;
             spot.position.x = radius * Math.cos(sunPos);
             spot.position.z = radius * Math.sin(sunPos);
-            sunPos += 0.01;
+            sunPos += 0.1;
         });
 
         return scene;
-    }
+    };
 
     var scene = createScene();
     engine.runRenderLoop(function () {
