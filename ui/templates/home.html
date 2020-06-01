@@ -41,7 +41,7 @@
                 var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
                 groundMaterial.diffuseTexture = new BABYLON.Texture(path, scene);
 
-                var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 200, 200, 250, 0, 3, scene, false);
+                var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 200, 200, 250, 0, 50, scene, false);
                 ground.material = groundMaterial;
 
                 //Sphere to see the light's position
@@ -115,8 +115,12 @@
 
 </head>
 <body>
-<select></select>
-<img src="" alt="heightmap" width="300" height="300"/>
-<canvas id="renderCanvas" touch-action="none"></canvas>
+<div style="width: 30%; display: inline-block; box-sizing: border-box; padding: 1em">
+    <select style="width: 100%"></select>
+    <img style="width: 100%" src="" alt="heightmap"/>
+</div><!--
+--><div style="width: 70%; display: inline-block; box-sizing: border-box; padding: 1em">
+    <canvas id="renderCanvas" touch-action="none" style="width: 100%"></canvas>
+</div>
 </body>
 </html>
