@@ -4,7 +4,6 @@ from NFP import core
 from config import Config
 from flask import Flask, render_template, send_file
 
-core.generate_heightmaps()
 app = Flask(__name__, template_folder=os.path.abspath('../ui/templates'))
 
 
@@ -15,7 +14,7 @@ def home():
 
 @app.route('/get-dem-paths')
 def get_dem_paths():
-    return json.dumps(Config.HEIGHTMAPS_FILENAMES)
+    return json.dumps(os.listdir(Config.HEIGHTMAPS_PATH))
 
 
 @app.route('/get-trajectory')
@@ -28,6 +27,3 @@ def get_trajectory():
 def get_dem(filename):
     dem_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
     return send_file(dem_path)
-
-
-app.run(host='127.0.0.1', port=3000, debug=True)

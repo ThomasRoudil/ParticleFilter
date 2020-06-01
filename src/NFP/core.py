@@ -7,7 +7,7 @@ from config import Config
 def generate_heightmaps():
     if not os.path.exists(Config.HEIGHTMAPS_PATH):
         os.makedirs(Config.HEIGHTMAPS_PATH)
-        for filename in Config.HEIGHTMAPS_FILENAMES:
+        for filename in os.listdir(Config.DB_PATH):
             if filename.endswith('.asc'):
                 dem_path = os.path.join(Config.DB_PATH, filename)
                 img = np.loadtxt(dem_path)

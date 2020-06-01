@@ -31,12 +31,7 @@
                     }
                 });
 
-                $.ajax({
-                    url: "/get-dem/" + filename,
-                    success: function(response) {
-                        console.log(response.split(' '))
-                    }
-                });
+                $('img').attr('src', "/get-dem/" + filename);
             })
 
         });
@@ -45,5 +40,6 @@
     </head>
     <body>
         <select></select>
+        <img src="" alt="heightmap" width="300" height="300"/>
     </body>
 </html>
