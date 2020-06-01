@@ -1,8 +1,11 @@
 import numpy as np
+import os
+from config import Config
 
 
-def generate_trajectory(dem_path):
-    Z = np.loadtxt(dem_path)
+def generate_trajectory(filename):
+    dem = os.path.join(Config.DB_PATH, 'filename')
+    z = np.loadtxt(dem)
 
     I, J = np.shape(Z)  # map dimensions
 

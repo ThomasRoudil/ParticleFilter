@@ -17,12 +17,12 @@ def get_dem_paths():
     return json.dumps(Config.DEM_PATHS)
 
 
-@app.route('/get-trajectory/<dem_path>')
-def get_trajectory(dem_path):
+@app.route('/get-trajectory/<filename>')
+def get_trajectory(filename):
     try:
-        trajectory = core.generate_trajectory(dem_path)
+        trajectory = core.generate_trajectory(filename)
     except OSError:
-        return f'Path {dem_path} cannot be found'
+        return f'File {filename} cannot be found', 404
     return json.dumps(trajectory)
 
 
