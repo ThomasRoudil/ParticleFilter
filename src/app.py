@@ -5,6 +5,7 @@ from config import Config
 from flask import Flask, render_template, send_file
 
 app = Flask(__name__, template_folder=os.path.abspath('../ui/templates'))
+app._static_folder = os.path.join(Config.UI_PATH, "static/")
 
 
 @app.route('/')
