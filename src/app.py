@@ -2,7 +2,7 @@ import os
 import json
 from NFP import core
 from config import Config
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 
 app = Flask(__name__, template_folder=os.path.abspath('../ui/templates'))
 
@@ -26,7 +26,7 @@ def get_trajectory():
 @app.route('/get-dem/<filename>')
 def get_dem(filename):
     dem_path = os.path.join(Config.DB_PATH, filename)
-    return json.dumps(Config.DB_PATH)
+    return send_file(dem_path)
 
 
 app.run(host='127.0.0.1', port=3000, debug=True)

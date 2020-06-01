@@ -34,7 +34,7 @@
                 $.ajax({
                     url: "/get-dem/" + filename,
                     success: function(response) {
-                        console.log(response)
+                        console.log(response.split(' '))
                     }
                 });
             })
