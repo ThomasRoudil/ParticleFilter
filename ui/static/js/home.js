@@ -1,10 +1,9 @@
 // Babylon.js render
 
-function drawMap(path) {
+function drawMap(path, positions=null) {
     var canvas = document.getElementById("babylon");
     var engine = new BABYLON.Engine(canvas, true);
-    var sunPos = 0;
-    var radius = 200;
+    var time = 0;
 
     var createScene = function () {
         var scene = new BABYLON.Scene(engine);
@@ -13,10 +12,10 @@ function drawMap(path) {
         var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 100, 45), scene);
         spot.diffuse = new BABYLON.Color3(1, 1, 1);
         spot.specular = new BABYLON.Color3(0, 0, 0);
-        spot.intensity = 0.7;
+        spot.intensity = 0.5;
 
         // Camera
-        var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 100, BABYLON.Vector3.Zero(), scene);
+        var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 1000, BABYLON.Vector3.Zero(), scene);
         camera.lowerBetaLimit = 0.1;
         camera.upperBetaLimit = (Math.PI / 2) * 0.9;
         camera.lowerRadiusLimit = 500;
@@ -25,7 +24,6 @@ function drawMap(path) {
 
         // Ground
         var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
-
         var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 250, 0, 100, scene, false);
         ground.material = groundMaterial;
 
@@ -35,12 +33,32 @@ function drawMap(path) {
         sun.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
 
         //Sun animation
-        scene.registerBeforeRender(function () {
-            sun.position = spot.position;
-            spot.position.x = radius * Math.cos(sunPos);
-            spot.position.z = radius * Math.sin(sunPos);
-            sunPos += 0.01;
-        });
+        if (positions) {
+            var points = [
+                new BABYLON.Vector3(positions[0].x - 500, 250, positions[0].y - 500),
+                new BABYLON.Vector3(positions[1].x - 500, 250, positions[1].y - 500)
+            ];
+            var direction = [
+                (positions[1].x - positions[0].x),
+                (positions[1].y - positions[0].y)
+            ]
+            scene.registerBeforeRender(function () {
+                sun.position = spot.position;
+                spot.position = new BABYLON.Vector3(positions[0].x - 500 + direction[0] * time, 250, positions[0].y - 500 + direction[1] * time);
+                time += 0.01;
+                if (time > 1)
+                    time = 0
+            });
+        }
+
+        // Trajectory
+        if (positions) {
+            var points = [
+                new BABYLON.Vector3(positions[0].x - 500, 250, positions[0].y - 500),
+                new BABYLON.Vector3(positions[1].x - 500, 250, positions[1].y - 500)
+            ];
+            var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: points}, scene);
+        }
 
         return scene;
     };
@@ -59,6 +77,7 @@ function drawMap(path) {
 // Chart.js render
 
 var chart;
+
 function drawChart(altitude_profile) {
     if (chart)
         chart.destroy();
@@ -90,7 +109,7 @@ function drawChart(altitude_profile) {
                     animateScale: true
                 },
                 elements: {
-                    point:{
+                    point: {
                         radius: 0
                     }
                 }
@@ -151,6 +170,9 @@ $(function () {
         }
     });
 
+    var p1;
+    var p2;
+
     $('select').on('change', function () {
         var filename = $(this).val();
         var path = "/get-dem/" + filename;
@@ -159,8 +181,6 @@ $(function () {
     });
 
     var img;
-    var p1;
-    var p2;
     $('canvas#draw').on('mousedown', function (event) {
         p1 = getOffset(event);
     });
@@ -175,17 +195,20 @@ $(function () {
         }
     })
     $('canvas#draw').on('mouseup', function (event) {
+        var positions = [
+            {
+                x: parseInt(p1.x * 1000 / img.clientWidth),
+                y: parseInt(p1.y * 1000 / img.clientHeight)
+            },
+            {
+                x: parseInt(p2.x * 1000 / img.clientWidth),
+                y: parseInt(p2.y * 1000 / img.clientHeight)
+            }
+        ];
+        drawMap("get-dem/" + $('select').val(), positions);
+
         var payload = {
-            positions: [
-                {
-                    x: parseInt(p1.x * 1000 / img.clientWidth),
-                    y: parseInt(p1.y * 1000 / img.clientHeight)
-                },
-                {
-                    x: parseInt(p2.x * 1000 / img.clientWidth),
-                    y: parseInt(p2.y * 1000 / img.clientHeight)
-                }
-            ],
+            positions: positions,
             filename: $('select').val()
         };
 

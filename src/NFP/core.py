@@ -14,7 +14,7 @@ def _generate_trajectory(p1, p2):
 
 
 def _get_altitude_from_point(point, heightmap):
-    return int(round(map_coordinates(heightmap, list([element] for element in point), order=1)[0], 2))
+    return int(round(map_coordinates(heightmap, list([element] for element in point), order=0)[0], 2))
 
 
 def generate_heightmaps():
