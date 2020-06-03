@@ -22,8 +22,8 @@ def generate_heightmaps_from_raw():
         os.makedirs(Config.HEIGHTMAPS_PATH)
         for filename in os.listdir(Config.RAW_PATH):
             if filename.endswith('.asc'):
-                dem_path = os.path.join(Config.RAW_PATH, filename)
-                img = np.loadtxt(dem_path, skiprows=6)
+                heightmap_path = os.path.join(Config.RAW_PATH, filename)
+                img = np.loadtxt(heightmap_path, skiprows=6)
                 img[img < 0] = 0
                 filename = filename.replace('.asc', Config.IMAGE_EXTENSION)
                 normalized_img = np.zeros(img.shape)

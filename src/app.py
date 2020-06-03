@@ -32,11 +32,11 @@ def get_altitude_profile():
 
 @app.route('/get-heightmap/<filename>')
 def get_dem(filename):
-    dem_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
-    return send_file(dem_path)
+    heightmap_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
+    return send_file(heightmap_path)
 
 
 @app.route('/get-colormap/<filename>')
 def get_colormap(filename):
-    dem_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
-    return send_file(dem_path)
+    colormap_path = os.path.join(Config.COLORMAPS_PATH, filename)
+    return send_file(colormap_path)
