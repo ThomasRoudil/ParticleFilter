@@ -150,10 +150,26 @@ $(function () {
             resize(canvas, img)
             drawLine(canvas, p1, p2, "#ff0000");
             console.log(p1, p2);
+            console.log(img.clientWidth)
         }
     })
     $('canvas#draw').on('mouseup', function (event) {
         p1 = null;
+
+        $.ajax({
+            url: "/get-altitude-profile",
+            data: null,
+            success: function (response) {
+                var paths = JSON.parse(response);
+                paths.map(function (path) {
+                    $('select').append('<option>' + path + '</option>');
+                });
+
+                $('img').attr('src', "/get-dem/" + paths[0]);
+                drawMap("/get-dem/" + paths[0]);
+                drawChart()
+            }
+        });
     });
 
 });
