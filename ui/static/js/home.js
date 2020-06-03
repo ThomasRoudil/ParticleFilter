@@ -125,7 +125,6 @@ function resize(canvas, img) {
 
 function drawLine(canvas, p1, p2, color) {
     let context = canvas.getContext('2d');
-    context.setLineDash([2]);
     context.lineWidth = 2;
     context.strokeStyle = color;
     context.beginPath();
@@ -172,7 +171,7 @@ $(function () {
             p2 = getOffset(event);
             reset(canvas);
             resize(canvas, img);
-            drawLine(canvas, p1, p2, "#ff0000");
+            drawLine(canvas, p1, p2, "#6bb3db");
         }
     })
     $('canvas#draw').on('mouseup', function (event) {

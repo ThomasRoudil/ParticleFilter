@@ -4,7 +4,7 @@ import os
 from config import Config
 from scipy.ndimage.interpolation import map_coordinates
 
-TIME_STEPS = 100
+TIME_STEPS = 2000
 
 
 def _generate_trajectory(p1, p2):
@@ -14,7 +14,7 @@ def _generate_trajectory(p1, p2):
 
 
 def _get_altitude_from_point(point, heightmap):
-    return int(round(map_coordinates(heightmap, list([element] for element in point), order=3)[0], 2))
+    return int(round(map_coordinates(heightmap, list([element] for element in point), order=1)[0], 2))
 
 
 def generate_heightmaps():
