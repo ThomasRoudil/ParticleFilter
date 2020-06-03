@@ -23,9 +23,10 @@ def generate_heightmaps():
         for filename in os.listdir(Config.DB_PATH):
             if filename.endswith('.asc'):
                 dem_path = os.path.join(Config.DB_PATH, filename)
-                img = np.loadtxt(dem_path)
+                img = np.loadtxt(dem_path, skiprows=7)
                 filename = filename.replace('.asc', Config.IMAGE_EXTENSION)
                 cv2.imwrite(os.path.join(Config.HEIGHTMAPS_PATH, filename), img)
+                print(f"Generated heightmap for file {filename}")
 
 
 def generate_altitude_profile(positions, filename):
@@ -33,8 +34,8 @@ def generate_altitude_profile(positions, filename):
     p2 = positions[1]
     trajectory = _generate_trajectory(p1, p2)
 
-    dem_path = os.path.join(Config.DB_PATH, filename)
-    heightmap = np.loadtxt(dem_path)
+    heightmap_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
+    heightmap = cv2.imread(heightmap_path, cv2.IMREAD_GRAYSCALE)
 
     altitude_profile = [_get_altitude_from_point(point, heightmap) for point in trajectory]
     return altitude_profile
@@ -42,5 +43,5 @@ def generate_altitude_profile(positions, filename):
 
 if __name__ == '__main__':
     positions = [(0, 100), (100, 950)]
-    generate_altitude_profile(positions, filename="BDALTIV2_75M_FXX_0375_6225_MNT_LAMB93_IGN69.asc")
+    generate_altitude_profile(positions, filename="BDALTIV2_75M_FXX_1050_6900_MNT_LAMB93_IGN69.png")
 

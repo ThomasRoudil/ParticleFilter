@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from NFP import core
 from config import Config
 from flask import Flask, render_template, send_file
@@ -15,7 +16,8 @@ def home():
 
 @app.route('/get-dem-paths')
 def get_dem_paths():
-    return json.dumps(os.listdir(Config.HEIGHTMAPS_PATH))
+    paths = [random.choice(os.listdir(Config.HEIGHTMAPS_PATH)) for i in range(10)]
+    return json.dumps(paths)
 
 
 @app.route('/get-trajectory')
