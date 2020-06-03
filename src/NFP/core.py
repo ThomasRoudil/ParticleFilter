@@ -32,6 +32,18 @@ def generate_heightmaps_from_raw():
                 print(f"Generated heightmap for file {filename}")
 
 
+def generate_colormap_from_heightmaps():
+    if not os.path.exists(Config.COLORMAPS_PATH):
+        os.makedirs(Config.COLORMAPS_PATH)
+        for filename in os.listdir(Config.HEIGHTMAPS_PATH):
+            if filename.endswith(Config.IMAGE_EXTENSION):
+                img = cv2.imread(os.path.join(Config.HEIGHTMAPS_PATH, filename))
+                img[np.where((img == [0, 0, 0]).all(axis=2))] = [255, 0, 0]
+                filename = filename.replace('.asc', Config.IMAGE_EXTENSION)
+                cv2.imwrite(os.path.join(Config.COLORMAPS_PATH, filename), img)
+                print(f"Generated colormap for file {filename}")
+
+
 def generate_altitude_profile(positions, filename):
     p1 = (positions[0]['y'], positions[0]['x'])
     p2 = (positions[1]['y'], positions[1]['x'])

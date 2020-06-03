@@ -6,5 +6,6 @@ class Config:
     DB_PATH = os.path.join(NFP_PATH, 'db')
     UI_PATH = os.path.join(NFP_PATH, 'ui')
     HEIGHTMAPS_PATH = os.path.join(DB_PATH, 'heightmaps')
+    COLORMAPS_PATH = os.path.join(DB_PATH, 'colormaps')
     RAW_PATH = os.path.join(DB_PATH, 'raw')
     IMAGE_EXTENSION = '.png'

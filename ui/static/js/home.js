@@ -2,7 +2,7 @@
 var engine;
 var scene;
 
-function drawMap(path) {
+function drawMap(path, path_colormap) {
 
     var createScene = function () {
         scene.clearColor = new BABYLON.Color3(1, 1, 1);
@@ -10,7 +10,7 @@ function drawMap(path) {
         var directional = new BABYLON.DirectionalLight("directional", new BABYLON.Vector3(0, -20, 45), scene);
         directional.diffuse = new BABYLON.Color3(1, 1, 1);
         directional.specular = new BABYLON.Color3(0, 0, 0);
-        directional.intensity = 0.5;
+        directional.intensity = 1;
 
 
         // Camera
@@ -23,6 +23,7 @@ function drawMap(path) {
 
         // Ground
         var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
+        groundMaterial.diffuseTexture = new BABYLON.Texture(path_colormap, scene);
         var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 500, 0, 100, scene, false);
         ground.material = groundMaterial;
 
@@ -127,15 +128,15 @@ $(function () {
     });
 
     $.ajax({
-        url: "/get-dem-paths",
+        url: "/get-heightmap-paths",
         success: function (response) {
             var paths = JSON.parse(response);
             paths.map(function (path, index) {
                 $('select').append('<option value="' + path + '">' + 'File : ' + index + '</option>');
             });
 
-            $('img').attr('src', "/get-dem/" + paths[0]);
-            drawMap("/get-dem/" + paths[0]);
+            $('img').attr('src', "/get-heightmap/" + paths[0]);
+            drawMap("/get-heightmap/" + paths[0], "/get-colormap/" + paths[0]);
         }
     });
 
@@ -144,9 +145,8 @@ $(function () {
 
     $('select').on('change', function () {
         var filename = $(this).val();
-        var path = "/get-dem/" + filename;
-        $('img').attr('src', path);
-        drawMap(path);
+        $('img').attr('src', "/get-heightmap/" + filename);
+        drawMap("/get-heightmap/" + filename, "/get-colormap/" + filename);
     });
 
     var img;

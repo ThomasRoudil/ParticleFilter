@@ -14,12 +14,12 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/get-dem-paths')
+@app.route('/get-heightmap-paths')
 def get_dem_paths():
     try:
         paths = [random.choice(os.listdir(Config.HEIGHTMAPS_PATH)) for i in range(10)]
     except IndexError:
-        return f"Please provide DEM models in {Config.HEIGHTMAPS_PATH} folder", 400
+        return f"Please provide heightmap models in {Config.HEIGHTMAPS_PATH} folder", 400
     return json.dumps(paths)
 
 
@@ -30,7 +30,13 @@ def get_altitude_profile():
     return json.dumps(altitude_profile)
 
 
-@app.route('/get-dem/<filename>')
+@app.route('/get-heightmap/<filename>')
 def get_dem(filename):
+    dem_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
+    return send_file(dem_path)
+
+
+@app.route('/get-colormap/<filename>')
+def get_colormap(filename):
     dem_path = os.path.join(Config.HEIGHTMAPS_PATH, filename)
     return send_file(dem_path)
