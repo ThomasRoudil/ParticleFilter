@@ -15,16 +15,16 @@ function drawMap(path, positions=null) {
         spot.intensity = 0.5;
 
         // Camera
-        var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 1000, BABYLON.Vector3.Zero(), scene);
+        var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1500, BABYLON.Vector3.Zero(), scene);
         camera.lowerBetaLimit = 0.1;
         camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-        camera.lowerRadiusLimit = 500;
+        camera.lowerRadiusLimit = 100;
         camera.upperRadiusLimit = 1500;
         camera.attachControl(canvas, true);
 
         // Ground
         var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
-        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 250, 0, 100, scene, false);
+        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 1000, 0, 100, scene, false);
         ground.material = groundMaterial;
 
         //Sphere to see the light's position
@@ -34,17 +34,13 @@ function drawMap(path, positions=null) {
 
         //Sun animation
         if (positions) {
-            var points = [
-                new BABYLON.Vector3(positions[0].x - 500, 250, positions[0].y - 500),
-                new BABYLON.Vector3(positions[1].x - 500, 250, positions[1].y - 500)
-            ];
             var direction = [
                 (positions[1].x - positions[0].x),
                 (positions[1].y - positions[0].y)
             ]
             scene.registerBeforeRender(function () {
                 sun.position = spot.position;
-                spot.position = new BABYLON.Vector3(positions[0].x - 500 + direction[0] * time, 250, positions[0].y - 500 + direction[1] * time);
+                spot.position = new BABYLON.Vector3(positions[0].y + direction[0] * time, 250, positions[0].y + direction[1] * time);
                 time += 0.01;
                 if (time > 1)
                     time = 0
@@ -54,8 +50,8 @@ function drawMap(path, positions=null) {
         // Trajectory
         if (positions) {
             var points = [
-                new BABYLON.Vector3(positions[0].x - 500, 250, positions[0].y - 500),
-                new BABYLON.Vector3(positions[1].x - 500, 250, positions[1].y - 500)
+                new BABYLON.Vector3(positions[0].x - 500, 110, positions[0].y - 500),
+                new BABYLON.Vector3(positions[1].x - 500, 110, positions[1].y - 500)
             ];
             var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: points}, scene);
         }
@@ -161,8 +157,8 @@ $(function () {
         url: "/get-dem-paths",
         success: function (response) {
             var paths = JSON.parse(response);
-            paths.map(function (path) {
-                $('select').append('<option>' + path + '</option>');
+            paths.map(function (path, index) {
+                $('select').append('<option value="' + path + '">' + 'File : ' + index + '</option>');
             });
 
             $('img').attr('src', "/get-dem/" + paths[0]);

@@ -20,24 +20,31 @@
           type="text/css"/>
 </head>
 <body>
-    <h3 class="padding text">
+    <h3 class="padding title-3 bold text">
         Neural Particle Filter (NPF)
     </h3>
 
-    <div class="padding inline width-20">
+    <div class="padding inline top width-25">
         <div class="text">
-            Please select a map
+            Pick a digital elevation model (DEM)
         </div>
-        <select class="full-width" style="margin-bottom: 16px;"></select>
-        <div class="relative">
+        <select style="margin-bottom: 16px;"></select>
+        <div class="text">
+            Heightmap
+        </div>
+        <div class="relative" style="transform: rotate(-90deg)">
             <img id="image" class="full-width" src="" alt="heightmap"/>
             <canvas id="draw"></canvas>
         </div>
-    </div><!--
- --><div class="padding inline width-40">
+        <div class="text">
+            Altitude profile
+        </div>
         <canvas id="chart"></canvas>
     </div><!--
- --><div class="padding inline width-40">
+ --><div class="padding inline top width-75">
+        <div class="text">
+            Rendered DEM
+        </div>
         <canvas id="babylon" class="full-width"></canvas>
     </div>
 </body>
