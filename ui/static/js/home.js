@@ -50,8 +50,8 @@ function drawMap(path, positions=null) {
         // Trajectory
         if (positions) {
             var points = [
-                new BABYLON.Vector3(positions[0].x - 500, 110, positions[0].y - 500),
-                new BABYLON.Vector3(positions[1].x - 500, 110, positions[1].y - 500)
+                new BABYLON.Vector3(positions[0].x - 500, 110, - positions[0].y + 500),
+                new BABYLON.Vector3(positions[1].x - 500, 110, - positions[1].y + 500)
             ];
             var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: points}, scene);
         }
