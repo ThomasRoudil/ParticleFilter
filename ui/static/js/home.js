@@ -1,18 +1,17 @@
 // Babylon.js render
+var engine;
+var scene;
 
-function drawMap(path, positions=null) {
-    var canvas = document.getElementById("babylon");
-    var engine = new BABYLON.Engine(canvas, true);
-    var time = 0;
+function drawMap(path) {
 
     var createScene = function () {
-        var scene = new BABYLON.Scene(engine);
+        scene.clearColor = new BABYLON.Color3(1, 1, 1);
 
-        // Light
-        var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 100, 45), scene);
-        spot.diffuse = new BABYLON.Color3(1, 1, 1);
-        spot.specular = new BABYLON.Color3(0, 0, 0);
-        spot.intensity = 0.5;
+        var directional = new BABYLON.DirectionalLight("directional", new BABYLON.Vector3(0, -20, 45), scene);
+        directional.diffuse = new BABYLON.Color3(1, 1, 1);
+        directional.specular = new BABYLON.Color3(0, 0, 0);
+        directional.intensity = 0.5;
+
 
         // Camera
         var camera = new BABYLON.ArcRotateCamera("Camera", 0, 0, 1500, BABYLON.Vector3.Zero(), scene);
@@ -20,46 +19,17 @@ function drawMap(path, positions=null) {
         camera.upperBetaLimit = (Math.PI / 2) * 0.9;
         camera.lowerRadiusLimit = 100;
         camera.upperRadiusLimit = 1500;
-        camera.attachControl(canvas, true);
+        camera.attachControl(document.getElementById("babylon"), true);
 
         // Ground
         var groundMaterial = new BABYLON.StandardMaterial("ground", scene);
-        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 1000, 0, 100, scene, false);
+        var ground = BABYLON.Mesh.CreateGroundFromHeightMap("ground", path, 1000, 1000, 500, 0, 100, scene, false);
         ground.material = groundMaterial;
-
-        //Sphere to see the light's position
-        var sun = BABYLON.Mesh.CreateSphere("sun", 10, 4, scene);
-        sun.material = new BABYLON.StandardMaterial("sun", scene);
-        sun.material.emissiveColor = new BABYLON.Color3(1, 1, 0);
-
-        //Sun animation
-        if (positions) {
-            var direction = [
-                (positions[1].x - positions[0].x),
-                (positions[1].y - positions[0].y)
-            ]
-            scene.registerBeforeRender(function () {
-                sun.position = spot.position;
-                spot.position = new BABYLON.Vector3(positions[0].y + direction[0] * time, 250, positions[0].y + direction[1] * time);
-                time += 0.01;
-                if (time > 1)
-                    time = 0
-            });
-        }
-
-        // Trajectory
-        if (positions) {
-            var points = [
-                new BABYLON.Vector3(positions[0].x - 500, 110, - positions[0].y + 500),
-                new BABYLON.Vector3(positions[1].x - 500, 110, - positions[1].y + 500)
-            ];
-            var lines = BABYLON.MeshBuilder.CreateLines("lines", {points: points}, scene);
-        }
 
         return scene;
     };
 
-    var scene = createScene();
+    createScene();
     engine.runRenderLoop(function () {
         scene.render();
     });
@@ -149,6 +119,9 @@ function drawLine(canvas, p1, p2, color) {
 }
 
 $(function () {
+    engine = new BABYLON.Engine(document.getElementById("babylon"), true);
+    scene = new BABYLON.Scene(engine);
+
     $("img").mousedown(function () {
         return false;
     });
@@ -201,7 +174,32 @@ $(function () {
                 y: parseInt(p2.y * 1000 / img.clientHeight)
             }
         ];
-        drawMap("get-dem/" + $('select').val(), positions);
+
+        // Plane animation
+        var time = 0;
+
+        var spot = new BABYLON.PointLight("spot", new BABYLON.Vector3(0, 100, 45), scene);
+        spot.diffuse = new BABYLON.Color3(0.3, 0.6, 0.8);
+        spot.specular = new BABYLON.Color3(0, 0, 0);
+        spot.intensity = 0.5;
+
+        var points = [
+            new BABYLON.Vector3(positions[0].x - 500, 110, - positions[0].y + 500),
+            new BABYLON.Vector3(positions[1].x - 500, 110, - positions[1].y + 500)
+        ];
+        var direction = [
+            (positions[1].x - positions[0].x),
+            (-positions[1].y + positions[0].y)
+        ];
+
+        scene.registerBeforeRender(function () {
+            spot.position = new BABYLON.Vector3(positions[0].x - 500 + direction[0] * time, 110, -positions[0].y + 500 + direction[1] * time);
+            time += 0.01;
+            if (time > 1)
+                time = 0
+        });
+
+        BABYLON.MeshBuilder.CreateLines("lines", {points: points}, scene);
 
         var payload = {
             positions: positions,
