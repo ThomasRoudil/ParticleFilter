@@ -17,15 +17,18 @@ def _get_altitude_from_point(point, heightmap):
     return int(round(map_coordinates(heightmap, list([element] for element in point), order=0)[0], 2))
 
 
-def generate_heightmaps():
+def generate_heightmaps_from_raw():
     if not os.path.exists(Config.HEIGHTMAPS_PATH):
         os.makedirs(Config.HEIGHTMAPS_PATH)
-        for filename in os.listdir(Config.DB_PATH):
+        for filename in os.listdir(Config.RAW_PATH):
             if filename.endswith('.asc'):
-                dem_path = os.path.join(Config.DB_PATH, filename)
-                img = np.loadtxt(dem_path, skiprows=7)
+                dem_path = os.path.join(Config.RAW_PATH, filename)
+                img = np.loadtxt(dem_path, skiprows=6)
+                img[img < 0] = 0
                 filename = filename.replace('.asc', Config.IMAGE_EXTENSION)
-                cv2.imwrite(os.path.join(Config.HEIGHTMAPS_PATH, filename), img)
+                normalized_img = np.zeros(img.shape)
+                normalized_img = cv2.normalize(img, normalized_img, 0, 255, cv2.NORM_MINMAX)
+                cv2.imwrite(os.path.join(Config.HEIGHTMAPS_PATH, filename), normalized_img)
                 print(f"Generated heightmap for file {filename}")
 
 
@@ -42,6 +45,4 @@ def generate_altitude_profile(positions, filename):
 
 
 if __name__ == '__main__':
-    positions = [(0, 100), (100, 950)]
-    generate_altitude_profile(positions, filename="BDALTIV2_75M_FXX_1050_6900_MNT_LAMB93_IGN69.png")
-
+    generate_heightmaps_from_raw()
