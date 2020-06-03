@@ -16,7 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <script src="https://cdn.babylonjs.com/serializers/babylonjs.serializers.min.js"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/home.js')}}"></script>
-    <link href="{{url_for('static', filename='stylesheets/layout.css')}}" media="screen, projection" rel="stylesheet"
+    <link href="{{url_for('static', filename='stylesheets/home.css')}}" media="screen, projection" rel="stylesheet"
           type="text/css"/>
 </head>
 <body>
@@ -29,13 +29,16 @@
             Please select a map
         </div>
         <select class="full-width" style="margin-bottom: 16px;"></select>
-        <img class="full-width" src="" alt="heightmap"/>
+        <div class="relative">
+            <img class="full-width" src="" alt="heightmap"/>
+            <canvas id="draw"></canvas>
+        </div>
     </div><!--
  --><div class="padding inline width-40">
         <canvas id="chart"></canvas>
     </div><!--
  --><div class="padding inline width-40">
-        <canvas id="renderCanvas" class="full-width"></canvas>
+        <canvas id="babylon" class="full-width"></canvas>
     </div>
 </body>
 </html>

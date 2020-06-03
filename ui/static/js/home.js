@@ -1,5 +1,7 @@
+// Babylon.js render
+
 function drawMap(path) {
-    var canvas = document.getElementById("renderCanvas");
+    var canvas = document.getElementById("babylon");
     var engine = new BABYLON.Engine(canvas, true);
     var sunPos = 0;
     var radius = 200;
@@ -53,6 +55,9 @@ function drawMap(path) {
     });
 }
 
+
+// Chart.js render
+
 function drawChart() {
     var ctx = document.getElementById('chart').getContext('2d');
 
@@ -71,8 +76,41 @@ function drawChart() {
     });
 }
 
+// Labeling utils functions
+
+function getOffset(ev) {
+    if (ev.layerX || ev.layerX === 0) { // Firefox
+        ev._x = ev.layerX;
+        ev._y = ev.layerY;
+    } else if (ev.offsetX || ev.offsetX === 0) { // Chrome & Opera
+        ev._x = ev.offsetX;
+        ev._y = ev.offsetY;
+    }
+
+    return {'x': ev._x, 'y': ev._y};
+}
+
+function reset(canvas) {
+    let context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+
+function drawRect(canvas, x, y, w, h, text, color) {
+    x = parseInt(x);
+    y = parseInt(y);
+    w = parseInt(w);
+    h = parseInt(h);
+    let context = canvas.getContext('2d');
+    context.setLineDash([5]);
+    context.lineWidth = 3;
+    context.strokeStyle = color;
+    context.strokeRect(x, y, w, h);
+    context.fillRect(x, y, w, h);
+}
+
 $(function () {
-    $("img").mousedown(function(){
+    $("img").mousedown(function () {
         return false;
     });
 
@@ -96,4 +134,19 @@ $(function () {
         $('img').attr('src', path);
         drawMap(path);
     });
+
+    var p1;
+    $('canvas#draw').on('mousedown', function (event) {
+        p1 = getOffset(event);
+    })
+
+    $('canvas#draw').on('mouseup', function (event) {
+        var p2 = getOffset(event);
+        var points = [
+             [p1.x, p1.y], [p2.x, p2.y]
+        ];
+        console.log(points)
+    })
+
+
 });
