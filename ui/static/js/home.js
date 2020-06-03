@@ -61,7 +61,7 @@ function drawMap(path) {
 function drawChart() {
     var ctx = document.getElementById('chart').getContext('2d');
 
-    var chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'line',
         data: {
             labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
@@ -69,7 +69,7 @@ function drawChart() {
                 label: 'Altitude profile',
                 backgroundColor: 'rgb(255, 99, 132)',
                 borderColor: 'rgb(255, 99, 132)',
-                data: [0, 10, 5, 2, 20, 30, 45]
+                data: [0, 100, 5, 2, 20, 30, 45]
             }]
         },
         options: {}
@@ -95,18 +95,20 @@ function reset(canvas) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 }
 
+function resize(canvas, img) {
+    canvas.width = img.clientWidth;
+    canvas.height = img.clientHeight;
+}
 
-function drawRect(canvas, x, y, w, h, text, color) {
-    x = parseInt(x);
-    y = parseInt(y);
-    w = parseInt(w);
-    h = parseInt(h);
+function drawLine(canvas, p1, p2, color) {
     let context = canvas.getContext('2d');
-    context.setLineDash([5]);
-    context.lineWidth = 3;
+    context.setLineDash([2]);
+    context.lineWidth = 2;
     context.strokeStyle = color;
-    context.strokeRect(x, y, w, h);
-    context.fillRect(x, y, w, h);
+    context.beginPath();
+    context.moveTo(p1.x, p1.y);
+    context.lineTo(p2.x, p2.y);
+    context.stroke();
 }
 
 $(function () {
@@ -138,15 +140,20 @@ $(function () {
     var p1;
     $('canvas#draw').on('mousedown', function (event) {
         p1 = getOffset(event);
+    });
+    $('canvas#draw').on('mousemove', function (event) {
+        if (p1) {
+            var canvas = document.getElementById("draw");
+            var img = document.getElementById("image");
+            var p2 = getOffset(event);
+            reset(canvas);
+            resize(canvas, img)
+            drawLine(canvas, p1, p2, "#ff0000");
+            console.log(p1, p2);
+        }
     })
-
     $('canvas#draw').on('mouseup', function (event) {
-        var p2 = getOffset(event);
-        var points = [
-             [p1.x, p1.y], [p2.x, p2.y]
-        ];
-        console.log(points)
-    })
-
+        p1 = null;
+    });
 
 });
