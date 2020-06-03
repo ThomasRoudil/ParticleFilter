@@ -24,7 +24,7 @@ def get_trajectory():
     return json.dumps([(d[0], d[1]) for d in trajectory])
 
 
-@app.route('/get-altitude_profile')
+@app.route('/get-altitude-profile')
 def get_altitude_profile(positions, filename):
     altitude_profile = core.generate_altitude_profile(positions, filename)
     return json.dumps(altitude_profile)
