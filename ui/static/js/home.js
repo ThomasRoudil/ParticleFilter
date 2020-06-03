@@ -54,6 +54,9 @@ function drawMap(path) {
 }
 
 $(function () {
+    $("img").mousedown(function(){
+        return false;
+    });
 
     $.ajax({
         url: "/get-dem-paths",
