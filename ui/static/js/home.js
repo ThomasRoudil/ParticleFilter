@@ -19,7 +19,7 @@ function drawMap(path) {
         var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, .8, 100, BABYLON.Vector3.Zero(), scene);
         camera.lowerBetaLimit = 0.1;
         camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-        camera.lowerRadiusLimit = 1000;
+        camera.lowerRadiusLimit = 500;
         camera.upperRadiusLimit = 1500;
         camera.attachControl(canvas, true);
 
@@ -58,22 +58,45 @@ function drawMap(path) {
 
 // Chart.js render
 
-function drawChart() {
+var chart;
+function drawChart(altitude_profile) {
+    if (chart)
+        chart.destroy();
+
     var ctx = document.getElementById('chart').getContext('2d');
 
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-            datasets: [{
-                label: 'Altitude profile',
-                backgroundColor: 'rgb(255, 99, 132)',
-                borderColor: 'rgb(255, 99, 132)',
-                data: [0, 100, 5, 2, 20, 30, 45]
-            }]
-        },
-        options: {}
-    });
+    chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: altitude_profile.map((el, index) => {
+                    return index
+                }),
+                datasets: [{
+                    label: 'Altitude profile',
+                    backgroundColor: 'rgba(64, 159, 210, 0.8)',
+                    borderColor: 'rgba(64, 159, 210, 0.8)',
+                    data: altitude_profile
+                }]
+            },
+            options: {
+                responsive: true,
+                legend: {
+                    display: false
+                },
+                tooltips: {
+                    enabled: false
+                },
+                animation: {
+                    animateScale: true
+                },
+                elements: {
+                    point:{
+                        radius: 0
+                    }
+                }
+            }
+        }
+    );
 }
 
 // Labeling utils functions
@@ -126,7 +149,6 @@ $(function () {
 
             $('img').attr('src', "/get-dem/" + paths[0]);
             drawMap("/get-dem/" + paths[0]);
-            drawChart()
         }
     });
 
@@ -137,39 +159,48 @@ $(function () {
         drawMap(path);
     });
 
+    var img;
     var p1;
+    var p2;
     $('canvas#draw').on('mousedown', function (event) {
         p1 = getOffset(event);
     });
     $('canvas#draw').on('mousemove', function (event) {
         if (p1) {
             var canvas = document.getElementById("draw");
-            var img = document.getElementById("image");
-            var p2 = getOffset(event);
+            img = document.getElementById("image");
+            p2 = getOffset(event);
             reset(canvas);
-            resize(canvas, img)
+            resize(canvas, img);
             drawLine(canvas, p1, p2, "#ff0000");
-            console.log(p1, p2);
-            console.log(img.clientWidth)
         }
     })
     $('canvas#draw').on('mouseup', function (event) {
-        p1 = null;
+        var payload = {
+            positions: [
+                {
+                    x: parseInt(p1.x * 1000 / img.clientWidth),
+                    y: parseInt(p1.y * 1000 / img.clientHeight)
+                },
+                {
+                    x: parseInt(p2.x * 1000 / img.clientWidth),
+                    y: parseInt(p2.y * 1000 / img.clientHeight)
+                }
+            ],
+            filename: $('select').val()
+        };
 
         $.ajax({
+            type: "POST",
             url: "/get-altitude-profile",
-            data: null,
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
             success: function (response) {
-                var paths = JSON.parse(response);
-                paths.map(function (path) {
-                    $('select').append('<option>' + path + '</option>');
-                });
-
-                $('img').attr('src', "/get-dem/" + paths[0]);
-                drawMap("/get-dem/" + paths[0]);
-                drawChart()
+                drawChart(JSON.parse(response));
             }
         });
+
+        p1 = null;
     });
 
 });

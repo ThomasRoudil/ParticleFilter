@@ -3,7 +3,7 @@ import os
 import random
 from NFP import core
 from config import Config
-from flask import Flask, render_template, send_file
+from flask import Flask, render_template, request, send_file
 
 app = Flask(__name__, template_folder=os.path.abspath('../ui/templates'))
 app._static_folder = os.path.join(Config.UI_PATH, "static/")
@@ -20,9 +20,10 @@ def get_dem_paths():
     return json.dumps(paths)
 
 
-@app.route('/get-altitude-profile')
-def get_altitude_profile(positions, filename):
-    altitude_profile = core.generate_altitude_profile(positions, filename)
+@app.route('/get-altitude-profile', methods=['POST'])
+def get_altitude_profile():
+    payload = request.get_json()
+    altitude_profile = core.generate_altitude_profile(payload['positions'], payload['filename'])
     return json.dumps(altitude_profile)
 
 
