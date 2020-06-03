@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import os
 from config import Config
+from NFP import utils
 from scipy.ndimage.interpolation import map_coordinates
 
 TIME_STEPS = 2000
@@ -38,7 +39,13 @@ def generate_colormap_from_heightmaps():
         for filename in os.listdir(Config.HEIGHTMAPS_PATH):
             if filename.endswith(Config.IMAGE_EXTENSION):
                 img = cv2.imread(os.path.join(Config.HEIGHTMAPS_PATH, filename))
-                img[np.where((img == [0, 0, 0]).all(axis=2))] = [255, 0, 0]
+                gradient = ['#303fd4'] + \
+                    utils.linear_gradient('#bda9a3', '#999287', n=10)['hex'] + \
+                    utils.linear_gradient('#999287', '#32610d', n=10)['hex'] + \
+                    utils.linear_gradient('#32610d', '#71c370', n=150)['hex'] + \
+                    utils.linear_gradient('#71c370', '#ecf1ed', 85)['hex']
+                for i, color in enumerate(gradient):
+                    img[np.where((img == [i, i, i]).all(axis=2))] = utils.hex_to_rgb(color)
                 filename = filename.replace('.asc', Config.IMAGE_EXTENSION)
                 cv2.imwrite(os.path.join(Config.COLORMAPS_PATH, filename), img)
                 print(f"Generated colormap for file {filename}")
