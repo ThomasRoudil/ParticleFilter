@@ -16,7 +16,10 @@ def home():
 
 @app.route('/get-dem-paths')
 def get_dem_paths():
-    paths = [random.choice(os.listdir(Config.HEIGHTMAPS_PATH)) for i in range(10)]
+    try:
+        paths = [random.choice(os.listdir(Config.HEIGHTMAPS_PATH)) for i in range(10)]
+    except IndexError:
+        return f"Please provide DEM models in {Config.HEIGHTMAPS_PATH} folder", 400
     return json.dumps(paths)
 
 
