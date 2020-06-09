@@ -5,12 +5,13 @@ import os
 from config import Config
 from scipy.ndimage.interpolation import map_coordinates
 
-TIME_STEPS = 50
+TIME_STEPS = 20
+PARTICLES_COUNT = 1000
 
 
 def _generate_trajectory(p1, p2):
-    speed = (p2[0] - p1[0], p2[1] - p1[1])
-    trajectory = [tuple(p1[index] + time * speed[index] / TIME_STEPS for index in range(2)) for time in
+    direction = (p2[0] - p1[0], p2[1] - p1[1])
+    trajectory = [tuple(p1[index] + time * direction[index] / TIME_STEPS for index in range(2)) for time in
                   range(TIME_STEPS + 1)]
     return trajectory
 
@@ -28,8 +29,11 @@ def _get_heightmap(filename):
 class Particle(dict):
     def __init__(self, x=None, y=None, filename=None, position=None):
         super().__init__()
-        self['x'] = x or random.randint(1, 1000)
-        self['y'] = y or random.randint(1, 1000)
+        self['x'] = round(x, 2) if x else random.randint(0, 500)
+        self['y'] = round(y, 2) if y else random.randint(0, 500)
+        # Constraints between 0, 1000
+        self['x'] = min(max(self['x'], 0), 1000)
+        self['y'] = min(max(self['y'], 0), 1000)
 
         if filename:
             heightmap = _get_heightmap(filename)
@@ -40,7 +44,7 @@ class Particle(dict):
                 self['delta_height'] = self.get_delta_height(altitude)
 
     def get_delta_height(self, altitude):
-        return abs(altitude - self['h'])
+        return round(abs(altitude - self['h']), 2)
 
 
 def generate_altitude_profile(positions, filename):
@@ -52,26 +56,30 @@ def generate_altitude_profile(positions, filename):
     return altitude_profile
 
 
-def get_particles_cloud_move(filename):
+def get_tensor_particles(filename):
     p1 = (1, 2)
     p2 = (488, 950)
+    direction = (p2[0] - p1[0], p2[1] - p1[1])
     trajectory = _generate_trajectory(p1, p2)
-    particles = [Particle(filename=filename, position=p1) for _ in range(50)]  # Initial particles
-    for k in range(TIME_STEPS):
-        particles = update_particles(particles, filename, position=trajectory[k+1])
-        particles_move(particles, p1, p2)
 
-    # TODO : finish this function (add move)
+    # Initial particles
+    particles = [Particle(filename=filename, position=p1) for _ in range(PARTICLES_COUNT)]
+    tensor_particles = [particles]
 
+    # Update particles and store each step in tensor
+    for position in trajectory:
+        particles = update_particles(particles, filename, position=position, direction=direction)
+        tensor_particles.append(particles)
 
-def particles_move(particles, p1, p2):
-    speed = (p2[0] - p1[0], p2[1] - p1[1])
-    for particle in particles:
-        particle['x'] = particle['x'] + speed[0] / TIME_STEPS
-        particle['y'] = particle['y'] + speed[1] / TIME_STEPS
+    return tensor_particles
 
 
-def update_particles(particles, filename, position):
+def update_particles(particles, filename, position, direction):
+    def move_particles(particles, direction):
+        for particle in particles:
+            particle['x'] = round(particle['x'] + direction[0] / TIME_STEPS, 2)
+            particle['y'] = round(particle['y'] + direction[1] / TIME_STEPS, 2)
+
     split_ratio = 0.2
     split_index = int(split_ratio * len(particles))
 
@@ -83,14 +91,16 @@ def update_particles(particles, filename, position):
     new_particles = [random.choice(weighted_particles) for _ in particles[split_index:]]
     new_particles = [
         Particle(
-            x=particle['x'] + random.randint(-20, 20),
-            y=particle['y'] + random.randint(-20, 20),
+            x=particle['x'] + random.randint(-10, 10),
+            y=particle['y'] + random.randint(-10, 10),
             filename=filename,
             position=position
         ) for particle in new_particles]
-    return weighted_particles + new_particles
+    particles = weighted_particles + new_particles
+    move_particles(particles, direction)
+    return particles
 
 
 if __name__ == '__main__':
     filename = "BDALTIV2_75M_FXX_0675_6750_MNT_LAMB93_IGN69.png"
-    get_particles_cloud_move(filename)
+    get_tensor_particles(filename)

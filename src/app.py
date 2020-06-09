@@ -40,9 +40,3 @@ def get_dem(filename):
 def get_colormap(filename):
     colormap_path = os.path.join(Config.COLORMAPS_PATH, filename)
     return send_file(colormap_path)
-
-
-@app.route('/get-particles/<filename>')
-def get_initial_particles(filename):
-    particles = core.get_initial_particles(filename)
-    return json.dumps(particles)
