@@ -56,11 +56,19 @@ def get_particles_cloud_move(filename):
     p1 = (1, 2)
     p2 = (488, 950)
     trajectory = _generate_trajectory(p1, p2)
-
     particles = [Particle(filename=filename, position=p1) for _ in range(50)]  # Initial particles
     for k in range(TIME_STEPS):
-        particles = update_particles(particles, filename, position=p1)
+        particles = update_particles(particles, filename, position=trajectory[k+1])
+        particles_move(particles, p1, p2)
+
     # TODO : finish this function (add move)
+
+
+def particles_move(particles, p1, p2):
+    speed = (p2[0] - p1[0], p2[1] - p1[1])
+    for particle in particles:
+        particle['x'] = particle['x'] + speed[0] / TIME_STEPS
+        particle['y'] = particle['y'] + speed[1] / TIME_STEPS
 
 
 def update_particles(particles, filename, position):
