@@ -26,13 +26,21 @@ def _get_heightmap(filename):
 
 
 class Particle(dict):
-    def __init__(self, filename, x=None, y=None):
+    def __init__(self, x=None, y=None, filename=None, position=None):
         super().__init__()
         self['x'] = x or random.randint(1, 1000)
         self['y'] = y or random.randint(1, 1000)
 
-        heightmap = _get_heightmap(filename)
-        self['h'] = _get_altitude_from_point(point=(self['x'], self['y']), heightmap=heightmap)
+        if filename:
+            heightmap = _get_heightmap(filename)
+            self['h'] = _get_altitude_from_point(point=(self['x'], self['y']), heightmap=heightmap)
+
+            if isinstance(position, tuple):
+                altitude = _get_altitude_from_point(point=position, heightmap=heightmap)
+                self['delta_height'] = self.get_delta_height(altitude)
+
+    def get_delta_height(self, altitude):
+        return abs(altitude - self['h'])
 
 
 def generate_altitude_profile(positions, filename):
@@ -45,24 +53,17 @@ def generate_altitude_profile(positions, filename):
 
 
 def get_particles_cloud_move(filename):
-    heightmap = _get_heightmap(filename)
-    trajectory = _generate_trajectory(p1=(1, 2), p2=(488, 950))
+    p1 = (1, 2)
+    p2 = (488, 950)
+    trajectory = _generate_trajectory(p1, p2)
 
-    particles = [Particle(filename) for _ in range(50)]  # Initial particles
+    particles = [Particle(filename=filename, position=p1) for _ in range(50)]  # Initial particles
     for k in range(TIME_STEPS):
-        particles = compute_plausibility_for_particles(particles, heightmap, trajectory)
-        particles = update_particles(particles, heightmap, trajectory)
-    # TODO : finish this function
+        particles = update_particles(particles, filename, position=p1)
+    # TODO : finish this function (add move)
 
 
-def compute_plausibility_for_particles(particles, heightmap, trajectory):
-    for particle in particles:
-        trajectory_altitude_point = _get_altitude_from_point((trajectory[0][0], trajectory[0][1]), heightmap)
-        particle['delta_height'] = abs(trajectory_altitude_point - particle['h'])
-    return particles
-
-
-def update_particles(particles, heightmap, trajectory):
+def update_particles(particles, filename, position):
     split_ratio = 0.2
     split_index = int(split_ratio * len(particles))
 
@@ -74,15 +75,14 @@ def update_particles(particles, heightmap, trajectory):
     new_particles = [random.choice(weighted_particles) for _ in particles[split_index:]]
     new_particles = [
         Particle(
-            filename,
             x=particle['x'] + random.randint(-20, 20),
-            y=particle['y'] + random.randint(-20, 20)
-        )
-        for particle in new_particles]
-    new_particles = compute_plausibility_for_particles(new_particles, heightmap, trajectory)
+            y=particle['y'] + random.randint(-20, 20),
+            filename=filename,
+            position=position
+        ) for particle in new_particles]
     return weighted_particles + new_particles
 
 
 if __name__ == '__main__':
-    filename = "BDALTIV2_75M_FXX_1050_6375_MNT_LAMB93_IGN69.png"
+    filename = "BDALTIV2_75M_FXX_0675_6750_MNT_LAMB93_IGN69.png"
     get_particles_cloud_move(filename)
