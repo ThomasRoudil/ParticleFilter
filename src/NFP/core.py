@@ -6,7 +6,7 @@ from config import Config
 from scipy.ndimage.interpolation import map_coordinates
 
 TIME_STEPS = 20
-PARTICLES_COUNT = 1000
+PARTICLES_COUNT = 100
 
 
 def _generate_trajectory(p1, p2):

@@ -40,3 +40,9 @@ def get_dem(filename):
 def get_colormap(filename):
     colormap_path = os.path.join(Config.COLORMAPS_PATH, filename)
     return send_file(colormap_path)
+
+
+@app.route('/get-tensor-particles/<filename>')
+def get_tensor_particles(filename):
+    tensor_particles = core.get_tensor_particles(filename)
+    return json.dumps(tensor_particles)
