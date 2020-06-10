@@ -26,7 +26,8 @@ def get_dem_paths():
 @app.route('/get-altitude-profile', methods=['POST'])
 def get_altitude_profile():
     payload = request.get_json()
-    altitude_profile = core.generate_altitude_profile(payload['positions'], payload['filename'])
+    altitude_profile = core.generate_altitude_profile(payload['filename'],
+                                                      payload['positions'])
     return json.dumps(altitude_profile)
 
 
@@ -42,7 +43,9 @@ def get_colormap(filename):
     return send_file(colormap_path)
 
 
-@app.route('/get-tensor-particles/<filename>')
-def get_tensor_particles(filename):
-    tensor_particles = core.get_tensor_particles(filename)
+@app.route('/get-tensor-particles', methods=['POST'])
+def get_tensor_particles():
+    payload = request.get_json()
+    tensor_particles = core.get_tensor_particles(payload['filename'],
+                                                 payload['positions'])
     return json.dumps(tensor_particles)

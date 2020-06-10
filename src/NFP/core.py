@@ -5,8 +5,8 @@ import os
 from config import Config
 from scipy.ndimage.interpolation import map_coordinates
 
-TIME_STEPS = 20
-PARTICLES_COUNT = 100
+TIME_STEPS = 15
+PARTICLES_COUNT = 40
 
 
 def _generate_trajectory(p1, p2):
@@ -29,8 +29,8 @@ def _get_heightmap(filename):
 class Particle(dict):
     def __init__(self, x=None, y=None, filename=None, position=None):
         super().__init__()
-        self['x'] = round(x, 2) if x else random.randint(0, 500)
-        self['y'] = round(y, 2) if y else random.randint(0, 500)
+        self['x'] = round(x, 2) if x else position[0] + random.randint(0, 50)
+        self['y'] = round(y, 2) if y else position[1] + random.randint(0, 50)
         # Constraints between 0, 1000
         self['x'] = min(max(self['x'], 0), 1000)
         self['y'] = min(max(self['y'], 0), 1000)
@@ -47,18 +47,18 @@ class Particle(dict):
         return round(abs(altitude - self['h']), 2)
 
 
-def generate_altitude_profile(positions, filename):
-    p1 = (positions[0]['y'], positions[0]['x'])
-    p2 = (positions[1]['y'], positions[1]['x'])
+def generate_altitude_profile(filename, positions):
+    p1 = (positions[0]['x'], positions[0]['y'])
+    p2 = (positions[1]['x'], positions[1]['y'])
     trajectory = _generate_trajectory(p1, p2)
     heightmap = _get_heightmap(filename)
     altitude_profile = [_get_altitude_from_point(point, heightmap) for point in trajectory]
     return altitude_profile
 
 
-def get_tensor_particles(filename):
-    p1 = (1, 2)
-    p2 = (488, 950)
+def get_tensor_particles(filename, positions):
+    p1 = (positions[0]['x'], positions[0]['y'])
+    p2 = (positions[1]['x'], positions[1]['y'])
     direction = (p2[0] - p1[0], p2[1] - p1[1])
     trajectory = _generate_trajectory(p1, p2)
 
@@ -80,7 +80,7 @@ def update_particles(particles, filename, position, direction):
             particle['x'] = round(particle['x'] + direction[0] / TIME_STEPS, 2)
             particle['y'] = round(particle['y'] + direction[1] / TIME_STEPS, 2)
 
-    split_ratio = 0.2
+    split_ratio = 0.4
     split_index = int(split_ratio * len(particles))
 
     delta_heights = list(map(lambda x: x['delta_height'], particles))
@@ -91,16 +91,11 @@ def update_particles(particles, filename, position, direction):
     new_particles = [random.choice(weighted_particles) for _ in particles[split_index:]]
     new_particles = [
         Particle(
-            x=particle['x'] + random.randint(-10, 10),
-            y=particle['y'] + random.randint(-10, 10),
+            x=particle['x'] + random.randint(-15, 15),
+            y=particle['y'] + random.randint(-15, 15),
             filename=filename,
             position=position
         ) for particle in new_particles]
     particles = weighted_particles + new_particles
     move_particles(particles, direction)
     return particles
-
-
-if __name__ == '__main__':
-    filename = "BDALTIV2_75M_FXX_0675_6750_MNT_LAMB93_IGN69.png"
-    get_tensor_particles(filename)

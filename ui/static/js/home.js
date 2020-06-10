@@ -128,14 +128,13 @@ function drawTensorParticles(tensor_particles) {
     tensor_particles.map((particles, index) => {
         setTimeout(() => {
             particles.map(particle => {
-                let particle3D = BABYLON.Mesh.CreateSphere("particle", 10, 4, scene);
+                let particle3D = BABYLON.Mesh.CreateSphere("particle", 10, 4, scene);  // Replace `4` with weight
                 particle3D.material = new BABYLON.StandardMaterial("particle", scene);
-                particle3D.material.emissiveColor = new BABYLON.Color3(1, 0, 0);
-                particle3D.position = new BABYLON.Vector3(particle.x - 500, particle.h, particle.y - 500);
+                particle3D.material.emissiveColor = new BABYLON.Color3(0, 1, 1);
+                particle3D.position = new BABYLON.Vector3(particle.x - 500, 110, 500 - particle.y);
             })
-        }, index * 1000)
+        }, index * 75)
     })
-
 }
 
 $(function () {
@@ -235,9 +234,13 @@ $(function () {
         });
 
         $.ajax({
-            type: "GET",
-            url: "/get-tensor-particles/" + filename,
+            type: "POST",
+            url: "/get-tensor-particles",
             contentType: 'application/json',
+            data: JSON.stringify({
+                positions: positions,
+                filename: filename
+            }),
             success: function (response) {
                 drawTensorParticles(JSON.parse(response))
             }
