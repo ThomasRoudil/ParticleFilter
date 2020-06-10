@@ -124,6 +124,20 @@ function drawLine(canvas, p1, p2, color) {
     context.stroke();
 }
 
+function drawTensorParticles(tensor_particles) {
+    tensor_particles.map((particles, index) => {
+        setTimeout(() => {
+            particles.map(particle => {
+                let particle3D = BABYLON.Mesh.CreateSphere("particle", 10, 4, scene);
+                particle3D.material = new BABYLON.StandardMaterial("particle", scene);
+                particle3D.material.emissiveColor = new BABYLON.Color3(1, 0, 0);
+                particle3D.position = new BABYLON.Vector3(particle.x - 500, particle.h, particle.y - 500);
+            })
+        }, index * 1000)
+    })
+
+}
+
 $(function () {
     engine = new BABYLON.Engine(document.getElementById("babylon"), true);
     scene = new BABYLON.Scene(engine);
@@ -206,20 +220,29 @@ $(function () {
 
         BABYLON.MeshBuilder.CreateLines("lines", {points: points}, scene);
 
-        var payload = {
-            positions: positions,
-            filename: $('select').val()
-        };
-
+        var filename = $('select').val()
         $.ajax({
             type: "POST",
             url: "/get-altitude-profile",
             contentType: 'application/json',
-            data: JSON.stringify(payload),
+            data: JSON.stringify({
+                positions: positions,
+                filename: filename
+            }),
             success: function (response) {
                 drawChart(JSON.parse(response));
             }
         });
+
+        $.ajax({
+            type: "GET",
+            url: "/get-tensor-particles/" + filename,
+            contentType: 'application/json',
+            success: function (response) {
+                drawTensorParticles(JSON.parse(response))
+            }
+        });
+
 
         p1 = null;
     });
