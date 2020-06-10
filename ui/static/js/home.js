@@ -3,6 +3,11 @@ var engine;
 var scene;
 
 function drawMap(path, path_colormap) {
+    scene.dispose();
+    engine.dispose();
+    engine = new BABYLON.Engine(document.getElementById("babylon"), true);
+    scene = new BABYLON.Scene(engine);
+
 
     var createScene = function () {
         scene.clearColor = new BABYLON.Color3(1, 1, 1);
