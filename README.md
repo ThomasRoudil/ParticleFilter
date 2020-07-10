@@ -1,3 +1,2 @@
-# ParticleFilter
+# Neural Particle Filter (NFP)
 
-Project ....
