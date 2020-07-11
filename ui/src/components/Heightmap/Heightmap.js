@@ -13,7 +13,9 @@ const useStyles = makeStyles(theme => ({
     canvas: {
         position: 'absolute',
         top: 0,
-        left: 0
+        left: 0,
+        cursor: 'crosshair',
+        zIndex: 1000
     }
 }));
 
@@ -40,13 +42,28 @@ function _getOffset(event) {
     return {'x': event._x, 'y': event._y};
 }
 
+function _drawCursor(canvas, offset) {
+    if (offset.x > 0 && offset.y > 0 && offset.x < canvas.width && offset.y < canvas.height) {
+        let context = canvas.getContext('2d');
+        context.setLineDash([5]);
+        context.strokeStyle = '#000000';
+        context.lineWidth = 3;
+        context.beginPath();
+        context.moveTo(-1000, offset.y);
+        context.lineTo(1000, offset.y);
+        context.moveTo(offset.x, 0);
+        context.lineTo(offset.x, 1000);
+        context.stroke();
+    }
+}
+
 function _drawLine(canvas, p1, p2, color) {
     let context = canvas.getContext('2d');
     context.lineWidth = 2;
     context.strokeStyle = color;
     context.beginPath();
     context.setLineDash([5, 3]);
-    context.translate(0.5,0.5);
+    context.translate(0.5, 0.5);
     context.moveTo(p1.x, p1.y);
     context.lineTo(p2.x, p2.y);
     context.stroke();
@@ -59,27 +76,36 @@ function Heightmap() {
     const canvasRef = React.useRef();
     const imageRef = React.useRef();
 
-    let p1, p2;
+    let p1, p2, _p1, _p2;
 
     if (!heightmap) return null;
 
     const handleMouseDown = event => {
-        p1 = _getOffset(event)
+        p1 = _getOffset(event);
     };
 
     const handleMouseMove = event => {
+        let canvas = canvasRef.current;
+        let img = imageRef.current;
+        _reset(canvas);
+        _resize(canvas, img);
         if (p1) {
-            let canvas = canvasRef.current;
-            let img = imageRef.current;
             p2 = _getOffset(event);
-            _reset(canvas);
-            _resize(canvas, img);
             _drawLine(canvas, p1, p2, "#6bb3db");
+        } else {
+            _drawCursor(canvas, _getOffset(event))
+
+            if (_p1 && _p2) {
+                _drawLine(canvas, _p1, _p2, "#6bb3db");
+            }
         }
     };
 
     const handleMouseUp = event => {
         if (!p1 || !p2) return;
+
+        _p1 = p1;
+        _p2 = p2;
 
         let img = imageRef.current;
         let positions = [
@@ -94,7 +120,6 @@ function Heightmap() {
         ];
 
         p1 = null;
-        p2 = null;
     };
 
     return (
