@@ -25,7 +25,7 @@ export default function AltitudeChart() {
 
     return (
         <React.Fragment>
-            <Title>Today</Title>
+            <Title>Altitude profile</Title>
             <ResponsiveContainer>
                 <LineChart
                     data={data}
@@ -43,7 +43,7 @@ export default function AltitudeChart() {
                             position="left"
                             style={{textAnchor: 'middle', fill: theme.palette.text.primary}}
                         >
-                            Sales ($)
+                            Altitude (m)
                         </Label>
                     </YAxis>
                     <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false}/>

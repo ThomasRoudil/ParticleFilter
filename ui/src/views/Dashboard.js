@@ -15,13 +15,13 @@ import {
     IconButton,
     Link,
     List,
-    Menu as MenuIcon,
     Paper,
     Toolbar,
     Typography
 } from "@material-ui/core";
 import {makeStyles} from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import MenuIcon from '@material-ui/icons/Menu';
 
 function Copyright() {
     return (
@@ -210,20 +210,21 @@ export default function Dashboard() {
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
-                        {/* Altitude profile */}
+                        <Grid item xs={12} md={5}>
+
+                        </Grid>
+                        <Grid item xs={12} md={7}>
+                            <Scene antialias onSceneReady={onSceneReady} onRender={onRender}/>
+                        </Grid>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={fixedHeightPaper}>
                                 <AltitudeChart/>
                             </Paper>
                         </Grid>
-                        {/* Recent Deposits */}
                         <Grid item xs={12} md={4} lg={3}>
                             <Paper className={fixedHeightPaper}>
                                 <Deposits/>
                             </Paper>
-                        </Grid>
-                        <Grid item>
-                            <Scene antialias onSceneReady={onSceneReady} onRender={onRender}/>
                         </Grid>
                     </Grid>
                     <Box pt={4}>
