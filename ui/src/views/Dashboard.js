@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import {Context} from "store/Heightmap";
+import {Context} from "store/Simulation";
 import {FreeCamera, Color3, Vector3, HemisphericLight, MeshBuilder} from '@babylonjs/core';
 import {AltitudeChart, Deposits, Heightmap, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
@@ -147,7 +147,7 @@ const onRender = scene => {
 
 
 export default function Dashboard() {
-    const {heightmap} = React.useContext(Context);
+    const {simulation} = React.useContext(Context);
     const classes = useStyles();
 
     const [ground, setGround] = React.useState('');
@@ -155,14 +155,14 @@ export default function Dashboard() {
         if (ground) {
             ground.isVisible = false;
         }
-        setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + heightmap, {
+        setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + simulation.filename, {
             width: 1000,
             height: 1000,
             subdivisions: 1200,
             minHeight: 0,
             maxHeight: 120
         }))
-    }, [heightmap]);
+    }, [simulation.filename]);
 
 
     const [open, setOpen] = React.useState(false);
@@ -225,7 +225,7 @@ export default function Dashboard() {
                             <Paper className={classes.paper}>
                                 <Scene
                                     antialias
-                                    onSceneReady={scene => onSceneReady(scene, heightmap)}
+                                    onSceneReady={scene => onSceneReady(scene, simulation.filename)}
                                     onRender={onRender}
                                 />
                             </Paper>

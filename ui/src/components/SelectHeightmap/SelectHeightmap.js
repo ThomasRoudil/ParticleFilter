@@ -1,6 +1,6 @@
 import React from 'react';
 import {api} from 'api';
-import {Context} from "store/Heightmap";
+import {Context} from "store/Simulation";
 import {FormControl, InputLabel, MenuItem, Select} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 
@@ -13,18 +13,19 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function SelectHeightmap() {
-    const {heightmap, setHeightmap} = React.useContext(Context);
+    const {simulation, setSimulation} = React.useContext(Context);
     const classes = useStyles();
 
-    const [heightmaps, setHeightmaps] = React.useState([]);
+    const [filenames, setFilenames] = React.useState([]);
     React.useEffect(() => {
-        api.get('/heightmaps')
-            .then(response => setHeightmaps(response.data))
+        api.get('/filenames')
+            .then(response => setFilenames(response.data))
     }, []);
 
     const handleChange = (event) => {
-        setHeightmap(event.target.value)
-        setHeightmap(event.target.value);
+        setSimulation({
+            filename: event.target.value
+        });
     };
 
     return (
@@ -32,10 +33,10 @@ function SelectHeightmap() {
             <InputLabel>Heightmap</InputLabel>
             <Select
                 label='heightmap'
-                value={heightmap}
+                value={simulation.filename}
                 onChange={handleChange}
             >
-                {heightmaps.map(filename => (
+                {filenames.map(filename => (
                     <MenuItem key={filename} value={filename}>{filename}</MenuItem>
                 ))}
             </Select>

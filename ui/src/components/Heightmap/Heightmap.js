@@ -1,5 +1,6 @@
 import React from 'react';
-import {Context} from "store/Heightmap";
+import {api} from 'api';
+import {Context} from "store/Simulation";
 import {makeStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -8,7 +9,8 @@ const useStyles = makeStyles(theme => ({
     },
     img: {
         width: '100%',
-        userSelect: 'none'
+        userSelect: 'none',
+        transform: 'rotate3d(1, 1, 0, 180deg)'
     },
     canvas: {
         position: 'absolute',
@@ -46,8 +48,8 @@ function _drawCursor(canvas, offset) {
     if (offset.x > 0 && offset.y > 0 && offset.x < canvas.width && offset.y < canvas.height) {
         let context = canvas.getContext('2d');
         context.setLineDash([5]);
-        context.strokeStyle = '#000000';
-        context.lineWidth = 3;
+        context.strokeStyle = '#dddddd';
+        context.lineWidth = 1;
         context.beginPath();
         context.moveTo(-1000, offset.y);
         context.lineTo(1000, offset.y);
@@ -70,7 +72,7 @@ function _drawLine(canvas, p1, p2, color) {
 }
 
 function Heightmap() {
-    const {heightmap} = React.useContext(Context);
+    const {simulation, setSimulation} = React.useContext(Context);
     const classes = useStyles();
 
     const canvasRef = React.useRef();
@@ -78,7 +80,7 @@ function Heightmap() {
 
     let p1, p2, _p1, _p2;
 
-    if (!heightmap) return null;
+    if (!simulation.filename) return null;
 
     const handleMouseDown = event => {
         if (!p1) {
@@ -120,7 +122,14 @@ function Heightmap() {
                 y: parseInt(p2.y * 1081 / img.clientHeight)
             }
         ];
-        console.log(positions)
+        api.post('/altitude-profile', {
+            filename: simulation.filename,
+            positions: positions
+        })
+            .then(response => setSimulation({
+                ...simulation,
+                altitude: response.data
+            }));
 
         p1 = null;
     };
@@ -144,7 +153,7 @@ function Heightmap() {
                 className={classes.img}
                 ref={imageRef}
                 onDragStart={event => event.preventDefault()}
-                src={`http://localhost:9000/get-heightmap/${heightmap}`}
+                src={`http://localhost:9000/get-heightmap/${simulation.filename}`}
                 alt='Heightmap'
             />
             <canvas

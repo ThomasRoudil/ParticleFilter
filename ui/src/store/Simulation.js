@@ -1,20 +1,22 @@
 import React from 'react';
 
 export const Context = React.createContext({
-    heightmap: null,
-    setHeightmap: () => {}
+    simulation: null,
+    setSimulation: () => {}
 });
 
 
 export const ContextProvider = (props) => {
 
-    const setHeightmap = heightmap => {
-        setState({...state, heightmap: heightmap});
+    const setSimulation = simulation => {
+        setState({...state, simulation: simulation});
     };
 
     const initState = {
-        heightmap: 'mountains.png',
-        setHeightmap: setHeightmap
+        simulation: {
+            filename: 'mountains.png'
+        },
+        setSimulation: setSimulation
     };
 
     const [state, setState] = React.useState(initState);
