@@ -23,7 +23,7 @@ PARTICLES_COUNT = 40
 
 def _get_heightmap(filename):
     heightmap_path = os.path.join(NPF.HEIGHTMAPS_PATH, filename)
-    heightmap = cv2.imread(heightmap_path, cv2.IMREAD_GRAYSCALE)
+    heightmap = cv2.imread(heightmap_path, -1)
     return heightmap
 
 
