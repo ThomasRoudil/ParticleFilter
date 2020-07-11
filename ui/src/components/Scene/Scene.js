@@ -51,6 +51,6 @@ export default (props) => {
     }, [reactCanvas]);
 
     return (
-        <canvas ref={reactCanvas} {...rest} />
+        <canvas className='fullwidth' ref={reactCanvas} {...rest} />
     );
 }

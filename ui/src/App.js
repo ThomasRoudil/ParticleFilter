@@ -1,6 +1,8 @@
 import React from 'react';
+import './App.scss';
 import {FreeCamera, Vector3, HemisphericLight, MeshBuilder} from '@babylonjs/core';
-import SceneComponent from './SceneComponent';
+import Scene from './components/Scene/Scene';
+import Dashboard from "./views/Dashboard";
 
 let box;
 
@@ -42,10 +44,11 @@ const onRender = scene => {
         const rpm = 10;
         box.rotation.y += ((rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000));
     }
-}
+};
 
 export default () => (
     <div>
-        <SceneComponent antialias onSceneReady={onSceneReady} onRender={onRender} id='my-canvas'/>
+        <Dashboard/>
+        <Scene antialias onSceneReady={onSceneReady} onRender={onRender}/>
     </div>
 )
