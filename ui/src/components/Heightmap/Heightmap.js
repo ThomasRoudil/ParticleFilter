@@ -110,14 +110,15 @@ function Heightmap() {
         let img = imageRef.current;
         let positions = [
             {
-                x: parseInt(p1.x / img.clientWidth),
-                y: parseInt(p1.y / img.clientHeight)
+                x: parseInt(p1.x * 1081 / img.clientWidth),
+                y: parseInt(p1.y * 1081 / img.clientHeight)
             },
             {
-                x: parseInt(p2.x / img.clientWidth),
-                y: parseInt(p2.y / img.clientHeight)
+                x: parseInt(p2.x * 1081 / img.clientWidth),
+                y: parseInt(p2.y * 1081 / img.clientHeight)
             }
         ];
+        console.log(positions)
 
         p1 = null;
     };
