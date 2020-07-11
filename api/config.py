@@ -3,8 +3,10 @@ from flask import Flask
 from pymongo import MongoClient
 
 
-class Config:
+class NPF:
     ROOT_PATH = os.path.abspath(os.path.join(Flask(__name__).root_path, os.pardir))
+    DB_PATH = os.path.join(ROOT_PATH, 'db')
+    HEIGHTMAPS_PATH = os.path.join(DB_PATH, 'heightmaps')
 
     UI_URL = 'https://127.0.0.1:3000/'
     API_URI = 'http://127.0.0.1:9000/'

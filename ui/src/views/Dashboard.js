@@ -1,7 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
-import {FreeCamera, Vector3, HemisphericLight, MeshBuilder} from '@babylonjs/core';
-import {AltitudeChart, Deposits, Scene} from 'components';
+import {Context} from "store/Heightmap";
+import {FreeCamera, Color3, Vector3, HemisphericLight, MeshBuilder} from '@babylonjs/core';
+import {AltitudeChart, Deposits, Heightmap, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
 
 import {
@@ -119,32 +120,21 @@ const useStyles = makeStyles((theme) => ({
 
 let box;
 
-const onSceneReady = scene => {
-    // This creates and positions a free camera (non-mesh)
-    const camera = new FreeCamera("camera1", new Vector3(0, 5, -10), scene);
+const onSceneReady = (scene, heightmap) => {
+    scene.clearColor = new Color3(1, 1, 1);
 
-    // This targets the camera to scene origin
+    const camera = new FreeCamera("camera", new Vector3(0, 150, 0), scene);
     camera.setTarget(Vector3.Zero());
-
     const canvas = scene.getEngine().getRenderingCanvas();
-
-    // This attaches the camera to the canvas
+    camera.lowerBetaLimit = 0.1;
+    camera.upperBetaLimit = (Math.PI / 2) * 0.9;
+    camera.lowerRadiusLimit = 100;
+    camera.upperRadiusLimit = 1500;
     camera.attachControl(canvas, true);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new HemisphericLight("light", new Vector3(0, 1, 0), scene);
-
-    // Default intensity is 1. Let's dim the light a small amount
+    const light = new HemisphericLight("light", new Vector3(-1, 0, -1), scene);
     light.intensity = 0.7;
-
-    // Our built-in 'box' shape.
-    box = MeshBuilder.CreateBox("box", {size: 2}, scene);
-
-    // Move the box upward 1/2 its height
-    box.position.y = 1;
-
-    // Our built-in 'ground' shape.
-    MeshBuilder.CreateGround("ground", {width: 6, height: 6}, scene);
 };
 
 /**
@@ -161,7 +151,24 @@ const onRender = scene => {
 
 
 export default function Dashboard() {
+    const {heightmap} = React.useContext(Context);
     const classes = useStyles();
+
+    const [ground, setGround] = React.useState('');
+    React.useEffect(() => {
+        if (ground) {
+            ground.isVisible = false;
+        }
+        setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + heightmap, {
+            width: 1000,
+            height: 1000,
+            subdivisions: 800,
+            minHeight: 0,
+            maxHeight: 300
+        }))
+    }, [heightmap]);
+
+
     const [open, setOpen] = React.useState(false);
     const handleDrawerOpen = () => {
         setOpen(true);
@@ -174,6 +181,7 @@ export default function Dashboard() {
     return (
         <div className={classes.root}>
             <CssBaseline/>
+
             <AppBar position="absolute" className={clsx(classes.appBar, open && classes.appBarShift)}>
                 <Toolbar className={classes.toolbar}>
                     <IconButton
@@ -206,15 +214,25 @@ export default function Dashboard() {
                 <List>{mainListItems}</List>
                 <Divider/>
             </Drawer>
+
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={5}>
-
+                            <Paper className={classes.paper}>
+                                <SelectHeightmap/>
+                                <Heightmap/>
+                            </Paper>
                         </Grid>
                         <Grid item xs={12} md={7}>
-                            <Scene antialias onSceneReady={onSceneReady} onRender={onRender}/>
+                            <Paper className={classes.paper}>
+                                <Scene
+                                    antialias
+                                    onSceneReady={scene => onSceneReady(scene, heightmap)}
+                                    onRender={onRender}
+                                />
+                            </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
                             <Paper className={fixedHeightPaper}>
