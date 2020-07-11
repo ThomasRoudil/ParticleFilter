@@ -81,7 +81,9 @@ function Heightmap() {
     if (!heightmap) return null;
 
     const handleMouseDown = event => {
-        p1 = _getOffset(event);
+        if (!p1) {
+            p1 = _getOffset(event);
+        }
     };
 
     const handleMouseMove = event => {
@@ -123,6 +125,19 @@ function Heightmap() {
         p1 = null;
     };
 
+    const handleMouseLeave = () => {
+        let canvas = canvasRef.current;
+        canvas && _reset(canvas);
+        if (_p1 && _p2) {
+            _drawLine(canvas, _p1, _p2, "#6bb3db");
+
+            if (p1) {
+                _reset(canvas);
+                _p1 = null;
+            }
+        }
+    };
+
     return (
         <div className={classes.root}>
             <img
@@ -138,6 +153,7 @@ function Heightmap() {
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
             />
         </div>
     )
