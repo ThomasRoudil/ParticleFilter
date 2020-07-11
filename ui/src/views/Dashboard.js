@@ -120,16 +120,12 @@ const useStyles = makeStyles((theme) => ({
 
 let box;
 
-const onSceneReady = (scene, heightmap) => {
+const onSceneReady = scene => {
     scene.clearColor = new Color3(1, 1, 1);
 
-    const camera = new FreeCamera("camera", new Vector3(0, 150, 0), scene);
+    const camera = new FreeCamera("camera", new Vector3(0, 100, 0), scene);
     camera.setTarget(Vector3.Zero());
     const canvas = scene.getEngine().getRenderingCanvas();
-    camera.lowerBetaLimit = 0.1;
-    camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-    camera.lowerRadiusLimit = 100;
-    camera.upperRadiusLimit = 1500;
     camera.attachControl(canvas, true);
 
     // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
@@ -162,9 +158,9 @@ export default function Dashboard() {
         setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + heightmap, {
             width: 1000,
             height: 1000,
-            subdivisions: 800,
+            subdivisions: 1200,
             minHeight: 0,
-            maxHeight: 300
+            maxHeight: 120
         }))
     }, [heightmap]);
 
