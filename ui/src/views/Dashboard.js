@@ -119,11 +119,12 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 let box;
+let camera;
 
 const onSceneReady = scene => {
     scene.clearColor = new Color3(1, 1, 1);
 
-    const camera = new FreeCamera("camera", new Vector3(0, 100, 0), scene);
+    camera = new FreeCamera("camera", new Vector3(0, 100, 0), scene);
     camera.setTarget(Vector3.Zero());
     const canvas = scene.getEngine().getRenderingCanvas();
     camera.attachControl(canvas, true);
@@ -163,6 +164,15 @@ export default function Dashboard() {
             maxHeight: 120
         })), 0)
     }, [simulation.filename]);
+
+    React.useEffect(() => {
+        if (simulation.positions && simulation.positions.length > 0) {
+            camera.position.x = simulation.positions[0].x;
+            camera.position.z = simulation.positions[0].y;
+            let target = new Vector3(simulation.positions[1].x, 50, simulation.positions[1].y);
+            camera.setTarget(target);
+        }
+    }, [simulation.positions]);
 
 
     const [open, setOpen] = React.useState(false);
