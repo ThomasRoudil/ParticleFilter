@@ -9,20 +9,8 @@ function createData(time, amount) {
     return {time, amount};
 }
 
-const data = [
-    createData(0, 0),
-    createData(1, 30),
-    createData(2, 60),
-    createData(3, 80),
-    createData(4, 100),
-    createData(5, 200),
-    createData(6, 200),
-    createData(7, 200),
-    createData(8, undefined),
-];
-
 export default function AltitudeChart() {
-    const {simulation, setSimulation} = React.useContext(Context);
+    const {simulation} = React.useContext(Context);
     const theme = useTheme();
 
     if (!simulation.altitude) return null;

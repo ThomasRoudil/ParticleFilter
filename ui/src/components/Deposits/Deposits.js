@@ -1,12 +1,9 @@
 import React from 'react';
-import Link from '@material-ui/core/Link';
+import {Context} from 'store/Simulation';
 import {makeStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Title from '../Title/Title';
 
-function preventDefault(event) {
-    event.preventDefault();
-}
 
 const useStyles = makeStyles({
     depositContext: {
@@ -14,22 +11,24 @@ const useStyles = makeStyles({
     },
 });
 
+const _getDistance = positions => {
+    let clientWidth = document.querySelector('img').clientWidth;
+    let clientHeight = document.querySelector('img').clientHeight;
+    return (60 / 1081 * Math.sqrt(((positions[1].x - positions[0].x) * 1081 / clientWidth) ** 2 + ((positions[1].y - positions[0].y) * 1081 / clientHeight) ** 2)).toFixed(2);
+};
+
 export default function Deposits() {
+    const {simulation} = React.useContext(Context);
     const classes = useStyles();
     return (
         <React.Fragment>
-            <Title>Recent Deposits</Title>
-            <Typography component="p" variant="h4">
-                $3,024.00
+            <Title>Trajectory</Title>
+            <Typography component='p' variant='h4'>
+                {simulation.positions.length > 0 && `${_getDistance(simulation.positions)} km`}
             </Typography>
-            <Typography color="textSecondary" className={classes.depositContext}>
-                on 15 March, 2019
+            <Typography color='textSecondary' className={classes.depositContext}>
+                real distance
             </Typography>
-            <div>
-                <Link color="primary" href="#" onClick={preventDefault}>
-                    View balance
-                </Link>
-            </div>
         </React.Fragment>
     );
 }

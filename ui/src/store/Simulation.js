@@ -14,7 +14,8 @@ export const ContextProvider = (props) => {
 
     const initState = {
         simulation: {
-            filename: 'mountains.png'
+            filename: 'mountains.png',
+            positions: []
         },
         setSimulation: setSimulation
     };

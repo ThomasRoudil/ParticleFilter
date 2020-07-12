@@ -64,11 +64,15 @@ function _drawLine(canvas, p1, p2, color) {
     context.lineWidth = 2;
     context.strokeStyle = color;
     context.beginPath();
-    context.setLineDash([5, 3]);
-    context.translate(0.5, 0.5);
+    context.setLineDash([5, 7]);
     context.moveTo(p1.x, p1.y);
     context.lineTo(p2.x, p2.y);
     context.stroke();
+    context.font = "14px serif";
+    context.fillStyle = "#ffffff";
+    context.textAlign = "center";
+    context.fillText(`${p1.x}  ${p1.y}`, p1.x, p2.y > p1.y ? p1.y : p1.y + 14);
+    context.fillText(`${p2.x}  ${p2.y}`, p2.x, p2.y > p1.y ? p2.y + 14 : p2.y);
 }
 
 function Heightmap() {
@@ -78,7 +82,7 @@ function Heightmap() {
     const canvasRef = React.useRef();
     const imageRef = React.useRef();
 
-    let p1, p2, _p1, _p2;
+    let p1, p2;
 
     if (!simulation.filename) return null;
 
@@ -91,7 +95,6 @@ function Heightmap() {
     const handleMouseMove = event => {
         let canvas = canvasRef.current;
         let img = imageRef.current;
-        _reset(canvas);
         _resize(canvas, img);
         if (p1) {
             p2 = _getOffset(event);
@@ -99,17 +102,14 @@ function Heightmap() {
         } else {
             _drawCursor(canvas, _getOffset(event))
 
-            if (_p1 && _p2) {
-                _drawLine(canvas, _p1, _p2, "#6bb3db");
+            if (simulation.positions.length > 0) {
+                _drawLine(canvas, simulation.positions[0], simulation.positions[1], "#6bb3db");
             }
         }
     };
 
     const handleMouseUp = event => {
         if (!p1 || !p2) return;
-
-        _p1 = p1;
-        _p2 = p2;
 
         let img = imageRef.current;
         let positions = [
@@ -126,23 +126,28 @@ function Heightmap() {
             filename: simulation.filename,
             positions: positions
         })
-            .then(response => setSimulation({
-                ...simulation,
-                altitude: response.data
-            }));
-
-        p1 = null;
+            .then(response => {
+                    setSimulation({
+                        ...simulation,
+                        altitude: response.data,
+                        positions: [p1, p2]
+                    });
+                    p1 = null;
+                }
+            );
     };
 
     const handleMouseLeave = () => {
         let canvas = canvasRef.current;
-        canvas && _reset(canvas);
-        if (_p1 && _p2) {
-            _drawLine(canvas, _p1, _p2, "#6bb3db");
+        if (simulation.positions.length > 0) {
+            _reset(canvas);
+            _drawLine(canvas, simulation.positions[0], simulation.positions[1], "#6bb3db");
 
             if (p1) {
-                _reset(canvas);
-                _p1 = null;
+                setSimulation({
+                    ...simulation,
+                    positions: []
+                });
             }
         }
     };

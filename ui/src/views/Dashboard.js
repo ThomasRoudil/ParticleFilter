@@ -155,13 +155,13 @@ export default function Dashboard() {
         if (ground) {
             ground.isVisible = false;
         }
-        setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + simulation.filename, {
-            width: 1000,
-            height: 1000,
+        setTimeout(() => setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + simulation.filename, {
+            width: 1081,
+            height: 1081,
             subdivisions: 1200,
             minHeight: 0,
             maxHeight: 120
-        }))
+        })), 0)
     }, [simulation.filename]);
 
 

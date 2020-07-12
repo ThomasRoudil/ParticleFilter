@@ -24,7 +24,9 @@ function SelectHeightmap() {
 
     const handleChange = (event) => {
         setSimulation({
-            filename: event.target.value
+            ...simulation,
+            filename: event.target.value,
+            positions: []
         });
     };
 
