@@ -128,7 +128,7 @@ function Heightmap() {
             .then(response => {
                     setSimulation({
                         ...simulation,
-                        altitude: response.data,
+                        altitude_profile: response.data,
                         positions: [p1, p2]
                     });
                     p1 = null;

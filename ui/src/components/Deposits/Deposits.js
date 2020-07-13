@@ -1,8 +1,9 @@
 import React from 'react';
+import {api} from 'api';
+import {Title} from 'components';
 import {Context} from 'store/Simulation';
 import {makeStyles} from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import Title from '../Title/Title';
+import {Button, Typography} from '@material-ui/core';
 
 
 const useStyles = makeStyles({
@@ -20,6 +21,15 @@ const _getDistance = positions => {
 export default function Deposits() {
     const {simulation} = React.useContext(Context);
     const classes = useStyles();
+    
+    const handleParticleFilter = () => {
+        api.post('/particle-filter', {
+            filename: simulation.filename,
+            positions: simulation.positions,
+            altitude_profile: simulation.altitude_profile
+        })
+    };
+    
     return (
         <React.Fragment>
             <Title>Trajectory</Title>
@@ -29,6 +39,14 @@ export default function Deposits() {
             <Typography color='textSecondary' className={classes.depositContext}>
                 real distance
             </Typography>
+            <Button 
+                variant='contained' 
+                color='secondary'
+                disabled={!simulation.filename || simulation.positions.length === 0}
+                onClick={handleParticleFilter}
+            >
+                Compute particle filter
+            </Button>
         </React.Fragment>
     );
 }

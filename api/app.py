@@ -71,6 +71,19 @@ def compute_altitude_profile(args):
     return json.dumps(altitude_profile)
 
 
+@app.route('/particle-filter', methods=['POST'])
+@use_args({
+    'filename': fields.Str(required=True),
+    'positions': fields.List(fields.Dict, required=True),
+    'altitude_profile': fields.List(fields.Int, required=True),
+})
+def compute_particle_filter(args):
+    filename = args['filename']
+    positions = args['positions']
+    altitude_profile = args['altitude_profile']
+    return json.dumps(altitude_profile)
+
+
 @app.errorhandler(errors.APIError)
 def handle_api_error(error):
     return error.flask_response()

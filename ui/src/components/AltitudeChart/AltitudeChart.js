@@ -13,14 +13,14 @@ export default function AltitudeChart() {
     const {simulation} = React.useContext(Context);
     const theme = useTheme();
 
-    if (!simulation.altitude) return null;
+    if (!simulation.altitude_profile) return null;
 
     return (
         <React.Fragment>
             <Title>Altitude profile</Title>
             <ResponsiveContainer>
                 <LineChart
-                    data={simulation.altitude.map((altitude, index) => createData(index, altitude))}
+                    data={simulation.altitude_profile.map((altitude, index) => createData(index, altitude))}
                     margin={{
                         top: 16,
                         right: 16,
