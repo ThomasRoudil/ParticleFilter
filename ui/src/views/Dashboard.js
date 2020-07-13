@@ -162,7 +162,7 @@ export default function Dashboard() {
             subdivisions: 1200,
             minHeight: 0,
             maxHeight: 120
-        })), 0)
+        })), 50)
     }, [simulation.filename]);
 
     React.useEffect(() => {
