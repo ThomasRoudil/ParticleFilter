@@ -49,6 +49,12 @@ def get_heightmap_file(filename):
     return send_file(heightmap_path)
 
 
+@app.route('/get-colormap/<filename>', methods=['GET'])
+def get_colormap_file(filename):
+    colormap_path = os.path.join(NPF.COLORMAPS_PATH, filename)
+    return send_file(colormap_path)
+
+
 @app.route('/altitude-profile', methods=['POST'])
 @use_args({
     'filename': fields.Str(required=True),
