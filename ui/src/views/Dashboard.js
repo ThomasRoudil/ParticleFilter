@@ -110,7 +110,7 @@ const useStyles = makeStyles((theme) => ({
     paper: {
         padding: theme.spacing(2),
         display: 'flex',
-        overflow: 'auto',
+        overflow: 'hidden',
         flexDirection: 'column',
     },
     fixedHeight: {
@@ -124,7 +124,7 @@ let camera;
 const onSceneReady = scene => {
     scene.clearColor = new Color3(1, 1, 1);
 
-    camera = new FreeCamera("camera", new Vector3(0, 100, 0), scene);
+    camera = new FreeCamera("camera", new Vector3(0, 500, 0), scene);
     camera.setTarget(Vector3.Zero());
     const canvas = scene.getEngine().getRenderingCanvas();
     camera.attachControl(canvas, true);
@@ -151,6 +151,7 @@ export default function Dashboard() {
     const {simulation} = React.useContext(Context);
     const classes = useStyles();
 
+    const [sceneState, setSceneState] = React.useState();
     const [ground, setGround] = React.useState('');
     React.useEffect(() => {
         if (ground) {
@@ -167,10 +168,27 @@ export default function Dashboard() {
 
     React.useEffect(() => {
         if (simulation.positions && simulation.positions.length > 0) {
-            camera.position.x = simulation.positions[0].x;
-            camera.position.z = simulation.positions[0].y;
-            let target = new Vector3(simulation.positions[1].x, 50, simulation.positions[1].y);
+
+            // Compute babylon space location
+            let clientWidth = document.querySelector('img').clientWidth;
+            let clientHeight = document.querySelector('img').clientHeight;
+            let spaceP1X = 1081 * (simulation.positions[0].x / clientWidth - 0.5);
+            let spaceP1Y = - 1081 * (simulation.positions[0].y / clientHeight - 0.5);
+            let spaceP2X = 1081 * (simulation.positions[1].x / clientWidth - 0.5);
+            let spaceP2Y = - 1081 * (simulation.positions[1].y / clientHeight - 0.5);
+
+            // Move camera
+            camera.position = new Vector3(spaceP1X, 150, spaceP1Y);
+            let target = new Vector3(spaceP2X, 150, spaceP2Y);
             camera.setTarget(target);
+
+            // Draw trajectory line
+            let points = [
+                new Vector3(spaceP1X, 90, spaceP1Y),
+                new Vector3(spaceP2X, 90, spaceP2Y),
+            ];
+            let lines = MeshBuilder.CreateDashedLines("lines", {points: points}, sceneState);
+            lines.color = Color3.FromHexString('#6bb3db')
         }
     }, [simulation.positions]);
 
@@ -225,17 +243,20 @@ export default function Dashboard() {
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
-                        <Grid item xs={12} md={5}>
+                        <Grid item xs={12} md={4}>
                             <Paper className={classes.paper}>
                                 <SelectHeightmap/>
                                 <Heightmap/>
                             </Paper>
                         </Grid>
-                        <Grid item xs={12} md={7}>
+                        <Grid item xs={12} md={8}>
                             <Paper className={classes.paper}>
                                 <Scene
                                     antialias
-                                    onSceneReady={scene => onSceneReady(scene, simulation.filename)}
+                                    onSceneReady={scene => {
+                                        setSceneState(scene);
+                                        onSceneReady(scene, simulation.filename)
+                                    }}
                                     onRender={onRender}
                                 />
                             </Paper>

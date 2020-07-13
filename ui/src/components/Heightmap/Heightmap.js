@@ -9,8 +9,7 @@ const useStyles = makeStyles(theme => ({
     },
     img: {
         width: '100%',
-        userSelect: 'none',
-        transform: 'rotate3d(1, 1, 0, 180deg)'
+        userSelect: 'none'
     },
     canvas: {
         position: 'absolute',

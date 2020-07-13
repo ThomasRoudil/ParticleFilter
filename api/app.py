@@ -35,8 +35,7 @@ def _generate_trajectory(p1, p2):
 
 
 def _get_altitude_from_point(point, heightmap):
-    return int(map_coordinates(heightmap, list([element] for element in point), order=0)[0])
-
+    return int(map_coordinates(heightmap, list(reversed(list([element] for element in point))), order=0)[0])
 
 
 @app.route('/filenames', methods=['GET'])
