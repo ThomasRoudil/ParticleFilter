@@ -138,16 +138,12 @@ function Heightmap() {
 
     const handleMouseLeave = () => {
         let canvas = canvasRef.current;
-        if (simulation.positions.length > 0) {
-            _reset(canvas);
-            _drawLine(canvas, simulation.positions[0], simulation.positions[1], "#6bb3db");
+        _reset(canvas);
+        if (p1) {
+        }
 
-            if (p1) {
-                setSimulation({
-                    ...simulation,
-                    positions: []
-                });
-            }
+        else if (simulation.positions.length > 0) {
+            _drawLine(canvas, simulation.positions[0], simulation.positions[1], "#6bb3db");
         }
     };
 

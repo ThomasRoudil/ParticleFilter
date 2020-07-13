@@ -1,7 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import {Context} from "store/Simulation";
-import {FreeCamera, Color3, Vector3, HemisphericLight, MeshBuilder} from '@babylonjs/core';
+import {FreeCamera, Color3, Vector3, HemisphericLight, MeshBuilder, StandardMaterial, Texture} from '@babylonjs/core';
 import {AltitudeChart, Deposits, Heightmap, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
 
@@ -127,6 +127,10 @@ const onSceneReady = scene => {
 
     camera = new FreeCamera("camera", new Vector3(0, 500, 0), scene);
     camera.setTarget(Vector3.Zero());
+    camera.lowerBetaLimit = 0.1;
+    camera.upperBetaLimit = (Math.PI / 2) * 0.9;
+    camera.lowerRadiusLimit = 100;
+    camera.upperRadiusLimit = 1500;
     const canvas = scene.getEngine().getRenderingCanvas();
     camera.attachControl(canvas, true);
 
@@ -154,17 +158,29 @@ export default function Dashboard() {
 
     const [sceneState, setSceneState] = React.useState();
     const [ground, setGround] = React.useState('');
+
     React.useEffect(() => {
-        if (ground) {
-            ground.isVisible = false;
+        if (simulation.filename) {
+            if (ground) {
+                ground.isVisible = false;
+            }
+            setTimeout(() => {
+                let local_ground = MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + simulation.filename, {
+                    width: 1081,
+                    height: 1081,
+                    subdivisions: 1200,
+                    minHeight: 0,
+                    maxHeight: 150
+                });
+                if (sceneState) {
+                    let groundMaterial = new StandardMaterial("ground", sceneState);
+                    groundMaterial.diffuseTexture = new Texture("http://localhost:9000/get-colormap/" + simulation.filename, sceneState);
+                    local_ground.material = groundMaterial;
+                }
+                if (lines) lines.isVisible = false;
+                setGround(local_ground)
+            }, 20)
         }
-        setTimeout(() => setGround(MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + simulation.filename, {
-            width: 1081,
-            height: 1081,
-            subdivisions: 1200,
-            minHeight: 0,
-            maxHeight: 120
-        })), 50)
     }, [simulation.filename]);
 
     React.useEffect(() => {
@@ -174,9 +190,9 @@ export default function Dashboard() {
             let clientWidth = document.querySelector('img').clientWidth;
             let clientHeight = document.querySelector('img').clientHeight;
             let spaceP1X = 1081 * (simulation.positions[0].x / clientWidth - 0.5);
-            let spaceP1Y = - 1081 * (simulation.positions[0].y / clientHeight - 0.5);
+            let spaceP1Y = -1081 * (simulation.positions[0].y / clientHeight - 0.5);
             let spaceP2X = 1081 * (simulation.positions[1].x / clientWidth - 0.5);
-            let spaceP2Y = - 1081 * (simulation.positions[1].y / clientHeight - 0.5);
+            let spaceP2Y = -1081 * (simulation.positions[1].y / clientHeight - 0.5);
 
             // Move camera
             camera.position = new Vector3(spaceP1X, 750, spaceP1Y);
@@ -189,7 +205,12 @@ export default function Dashboard() {
                 new Vector3(spaceP2X, 90, spaceP2Y),
             ];
             if (lines) lines.isVisible = false;
-            lines = MeshBuilder.CreateDashedLines("lines", {points: points, dashSize: 5, dashNb: 40, gapSize: 5}, sceneState);
+            lines = MeshBuilder.CreateDashedLines("lines", {
+                points: points,
+                dashSize: 5,
+                dashNb: 40,
+                gapSize: 5
+            }, sceneState);
             lines.color = Color3.FromHexString('#6bb3db')
         }
     }, [simulation.positions]);

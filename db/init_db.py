@@ -12,5 +12,5 @@ for file in os.listdir(NPF.HEIGHTMAPS_PATH):
     colormap_path = os.path.join(NPF.COLORMAPS_PATH, file)
     img = cv2.imread(heightmap_path, cv2.IMREAD_GRAYSCALE)
     cv2.normalize(img, img, 0, 255, norm_type=cv2.NORM_MINMAX)
-    img = cv2.applyColorMap(img, cv2.COLORMAP_HSV)
+    img = cv2.applyColorMap(img, cv2.COLORMAP_PARULA)
     cv2.imwrite(colormap_path, img)
