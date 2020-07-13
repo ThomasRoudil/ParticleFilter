@@ -120,6 +120,7 @@ const useStyles = makeStyles((theme) => ({
 
 let box;
 let camera;
+let lines;
 
 const onSceneReady = scene => {
     scene.clearColor = new Color3(1, 1, 1);
@@ -178,8 +179,8 @@ export default function Dashboard() {
             let spaceP2Y = - 1081 * (simulation.positions[1].y / clientHeight - 0.5);
 
             // Move camera
-            camera.position = new Vector3(spaceP1X, 150, spaceP1Y);
-            let target = new Vector3(spaceP2X, 150, spaceP2Y);
+            camera.position = new Vector3(spaceP1X, 750, spaceP1Y);
+            let target = new Vector3(spaceP2X, -1000, spaceP2Y);
             camera.setTarget(target);
 
             // Draw trajectory line
@@ -187,7 +188,8 @@ export default function Dashboard() {
                 new Vector3(spaceP1X, 90, spaceP1Y),
                 new Vector3(spaceP2X, 90, spaceP2Y),
             ];
-            let lines = MeshBuilder.CreateDashedLines("lines", {points: points}, sceneState);
+            if (lines) lines.isVisible = false;
+            lines = MeshBuilder.CreateDashedLines("lines", {points: points, dashSize: 5, dashNb: 40, gapSize: 5}, sceneState);
             lines.color = Color3.FromHexString('#6bb3db')
         }
     }, [simulation.positions]);
