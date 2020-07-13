@@ -40,7 +40,7 @@ def _get_altitude_from_point(point, heightmap):
 
 @app.route('/filenames', methods=['GET'])
 def get_heightmap_filenames():
-    return json.dumps(list(reversed(os.listdir(NPF.HEIGHTMAPS_PATH))))
+    return json.dumps(os.listdir(NPF.HEIGHTMAPS_PATH))
 
 
 @app.route('/get-heightmap/<filename>', methods=['GET'])

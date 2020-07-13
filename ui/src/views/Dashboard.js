@@ -125,7 +125,7 @@ let lines;
 const onSceneReady = scene => {
     scene.clearColor = new Color3(1, 1, 1);
 
-    camera = new FreeCamera("camera", new Vector3(0, 500, 0), scene);
+    camera = new FreeCamera("camera", new Vector3(0, 1000, -1), scene);
     camera.setTarget(Vector3.Zero());
     camera.lowerBetaLimit = 0.1;
     camera.upperBetaLimit = (Math.PI / 2) * 0.9;
