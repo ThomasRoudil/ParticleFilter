@@ -83,7 +83,7 @@ def compute_particle_filter(args):
     altitude_profile = args['altitude_profile']
 
     N = 200
-    particles = np.random.uniform(0, TIME_STEPS, (N, 1))
+    particles = np.random.uniform(0, TIME_STEPS, N)
 
     tensor_particles = []
     for plane_altitude in altitude_profile:
@@ -92,13 +92,21 @@ def compute_particle_filter(args):
         weights = weights * ((1 / np.sqrt(2 * np.pi)) * np.exp(-((plane_altitude - measures) / max(altitude_profile)) ** 2 / 4))
         weights = weights / np.sum(weights)
 
-        #  Resample
+        # Resample
         weights_cumulative = np.cumsum(weights)
         u = np.random.uniform(0, 1, N)
         ind1 = np.argsort(np.append(u, weights_cumulative))
         ind = np.array([i for i, x in enumerate(ind1) if x < N]) - np.arange(0, N)
         particles = particles[ind]
-        tensor_particles.extend(list([particle[0] for particle in particles]))
+
+        # Save particles in tensor
+        tensor_particles.extend(particles)
+
+        # Dynamics
+        speed = 1 / TIME_STEPS
+        speed_noise = 0.1 * np.random.uniform(0, 1, len(particles))
+        particles = particles + speed_noise + speed
+
     return json.dumps(tensor_particles)
 
 
