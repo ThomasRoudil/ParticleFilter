@@ -83,14 +83,21 @@ def compute_particle_filter(args):
     altitude_profile = args['altitude_profile']
 
     N = 200
-    particles = np.random.uniform(1, N, (N, 1))
+    particles = np.random.uniform(1, TIME_STEPS, (N, 1))
 
+    tensor_particles = []
     for plane_altitude in altitude_profile:
         measures = np.array(list(map(lambda x: altitude_profile[int(x)], particles)))
-        weights = 1 / N * np.ones(N)
+        weights = 1 / len(measures) * np.ones(len(measures))
         weights = weights * ((1 / np.sqrt(2 * np.pi)) * np.exp(-((plane_altitude - measures) / max(altitude_profile)) ** 2 / 4))
         weights = (weights - weights.min()) / (weights.max() - weights.min())
-        return json.dumps({'particles': list(particle[0] for particle in particles), 'weights': list(weights)})
+
+        #  Resample
+        particles = particles[weights > 0.6]
+        new_particles = np.random.uniform(1, TIME_STEPS, (N - len(particles), 1))
+        particles = np.append(particles, new_particles)
+        tensor_particles.extend(particles)
+    return json.dumps(tensor_particles)
 
 
 @app.errorhandler(errors.APIError)
