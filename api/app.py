@@ -1,6 +1,8 @@
 import cv2
 import json
+import numpy as np
 import os
+
 from flask import Flask, send_file
 from flask_cors import CORS
 from scipy.ndimage.interpolation import map_coordinates
@@ -16,9 +18,7 @@ CORS(app)
 config_name = os.getenv('FLASK_UI_CONFIGURATION', 'development')
 app.secret_key = app.config['SECRET_KEY']
 
-
 TIME_STEPS = 500
-PARTICLES_COUNT = 40
 
 
 def _get_heightmap(filename):
@@ -81,7 +81,16 @@ def compute_particle_filter(args):
     filename = args['filename']
     positions = args['positions']
     altitude_profile = args['altitude_profile']
-    return json.dumps(altitude_profile)
+
+    N = 200
+    particles = np.random.uniform(1, N, (N, 1))
+
+    for plane_altitude in altitude_profile:
+        measures = np.array(list(map(lambda x: altitude_profile[int(x)], particles)))
+        weights = 1 / N * np.ones(N)
+        weights = weights * ((1 / np.sqrt(2 * np.pi)) * np.exp(-((plane_altitude - measures) / max(altitude_profile)) ** 2 / 4))
+        weights = (weights - weights.min()) / (weights.max() - weights.min())
+        return json.dumps({'particles': list(particle[0] for particle in particles), 'weights': list(weights)})
 
 
 @app.errorhandler(errors.APIError)
