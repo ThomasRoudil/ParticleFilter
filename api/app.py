@@ -73,13 +73,9 @@ def compute_altitude_profile(args):
 
 @app.route('/particle-filter', methods=['POST'])
 @use_args({
-    'filename': fields.Str(required=True),
-    'positions': fields.List(fields.Dict, required=True),
-    'altitude_profile': fields.List(fields.Int, required=True),
+    'altitude_profile': fields.List(fields.Int, required=True)
 })
 def compute_particle_filter(args):
-    filename = args['filename']
-    positions = args['positions']
     altitude_profile = args['altitude_profile']
 
     N = 200
@@ -100,12 +96,13 @@ def compute_particle_filter(args):
         particles = particles[ind]
 
         # Save particles in tensor
-        tensor_particles.extend(particles)
+        tensor_particles.append(list(particles))
 
         # Dynamics
-        speed = 1 / TIME_STEPS
+        speed = 0.5
         speed_noise = 0.1 * np.random.uniform(0, 1, len(particles))
         particles = particles + speed_noise + speed
+        particles = np.array([min(particle, 499) for particle in particles])
 
     return json.dumps(tensor_particles)
 

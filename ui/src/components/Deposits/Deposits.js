@@ -19,15 +19,19 @@ const _getDistance = positions => {
 };
 
 export default function Deposits() {
-    const {simulation} = React.useContext(Context);
+    const {simulation, setSimulation} = React.useContext(Context);
     const classes = useStyles();
     
     const handleParticleFilter = () => {
         api.post('/particle-filter', {
-            filename: simulation.filename,
-            positions: simulation.positions,
             altitude_profile: simulation.altitude_profile
         })
+            .then(response => {
+                setSimulation({
+                    ...simulation,
+                    tensor_particles: response.data
+                })
+            })
     };
     
     return (

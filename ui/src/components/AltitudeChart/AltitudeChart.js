@@ -2,6 +2,7 @@ import React from 'react';
 import {Context} from "store/Simulation";
 import {useTheme} from '@material-ui/core/styles';
 import {LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer} from 'recharts';
+import {Slider} from "@material-ui/core";
 import Title from '../Title/Title';
 
 // Generate Sales Data
@@ -12,6 +13,11 @@ function createData(time, amount) {
 export default function AltitudeChart() {
     const {simulation} = React.useContext(Context);
     const theme = useTheme();
+
+    const [current, setCurrent] = React.useState(0);
+    const handleDisplayParticles = (event, value) => {
+        setCurrent(value)
+    };
 
     if (!simulation.altitude_profile) return null;
 
@@ -41,6 +47,18 @@ export default function AltitudeChart() {
                     <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false}/>
                 </LineChart>
             </ResponsiveContainer>
+
+            <Slider
+                defaultValue={0}
+                onChange={handleDisplayParticles}
+                step={1}
+                marks
+                min={0}
+                max={500}
+                disabled={!simulation.tensor_particles || simulation.tensor_particles.length === 0}
+            />
+
+            {JSON.stringify(simulation.tensor_particles[current])}
         </React.Fragment>
     );
 }
