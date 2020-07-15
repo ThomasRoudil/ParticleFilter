@@ -96,11 +96,11 @@ def compute_particle_filter(args):
         particles = particles[ind]
 
         # Save particles in tensor
-        tensor_particles.append(list(particles))
+        tensor_particles.append([int(particle) for particle in particles])
 
         # Dynamics
-        speed = 0.5
-        speed_noise = 0.1 * np.random.uniform(0, 1, len(particles))
+        speed = 1
+        speed_noise = 1 * np.random.uniform(-1, 1, len(particles))
         particles = particles + speed_noise + speed
         particles = np.array([min(particle, 499) for particle in particles])
 
