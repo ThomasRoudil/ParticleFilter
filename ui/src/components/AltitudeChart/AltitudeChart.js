@@ -61,7 +61,7 @@ export default function AltitudeChart() {
                         data={simulation.tensor_particles[current] && simulation.tensor_particles[current].map(value => {
                             return {
                                 x: value,
-                                y: 500
+                                y: 100 + Math.random() * 100
                             }
                         })}
                         fill="#8884d8"
@@ -69,7 +69,7 @@ export default function AltitudeChart() {
                     <Scatter
                         data={[{
                             x: current,
-                            y: 400
+                            y: 0
                         }]}
                         fill="#ff0000"
                     />
