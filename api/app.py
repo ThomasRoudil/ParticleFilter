@@ -7,13 +7,13 @@ from collections import namedtuple
 from flask import Flask, send_file
 from flask_cors import CORS
 from scipy.ndimage.interpolation import map_coordinates
-from pfilter import independent_sample, ParticleFilter, cauchy_noise, squared_error
 from scipy.stats import norm, bernoulli
 from webargs import fields
 from webargs.flaskparser import use_args
 
 from api import errors
 from api.config import NPF
+from api.core.pfilter import ParticleFilter, independent_sample, cauchy_noise, squared_error
 
 app = Flask(__name__)
 CORS(app)
