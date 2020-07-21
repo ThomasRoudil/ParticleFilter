@@ -11,10 +11,41 @@ const useStyles = makeStyles({
 });
 
 
-export default function ParticleFilter() {
-    const {simulation, setSimulation} = React.useContext(Context);
-    const classes = useStyles();
+const ParticlesChart = props => {
+    const {current, data, max} = props;
+    const {simulation} = React.useContext(Context);
     const theme = useTheme();
+
+    return (
+        <ResponsiveContainer>
+            <ScatterChart
+                margin={{
+                    top: 20, right: 20, bottom: 20, left: 20,
+                }}
+            >
+                <XAxis type='number' dataKey='x' domain={[-max, max]} hide/>
+                <YAxis stroke={theme.palette.text.secondary} type='number' dataKey='y'/>
+                <Scatter
+                    data={simulation.particle_filters[current] && simulation.particle_filters[current].particles[data]
+                        .filter(value => value < max)
+                        .filter(value => value > -max)
+                        .map(value => {
+                            return {
+                                x: value,
+                                y: Math.random() * 50
+                            }
+                        })}
+                    fill='#8884d8'
+                />
+            </ScatterChart>
+        </ResponsiveContainer>
+    )
+}
+
+
+export default function ParticleFilter() {
+    const {simulation} = React.useContext(Context);
+    const classes = useStyles();
 
     const [current, setCurrent] = React.useState(0);
     const handleDisplayParticles = (event, value) => {
@@ -24,37 +55,26 @@ export default function ParticleFilter() {
     return (
         <React.Fragment>
             <Title>Particle filter</Title>
-            <ResponsiveContainer>
-                <ScatterChart
-                    width={400}
-                    height={400}
-                    margin={{
-                        top: 20, right: 20, bottom: 20, left: 20,
-                    }}
-                >
-                    <XAxis stroke={theme.palette.text.secondary} type='number' dataKey='x' domain={[-30000, 30000]}/>
-                    <YAxis stroke={theme.palette.text.secondary} type='number' dataKey='y'/>
-                    <Scatter
-                        data={simulation.particle_filters[current] && simulation.particle_filters[current]
-                            .filter(value => value < 30000)
-                            .filter(value => value > -30000)
-                            .map(value => {
-                                return {
-                                    x: value,
-                                    y: 100 + Math.random() * 100
-                                }
-                            })}
-                        fill='#8884d8'
-                    />
-                    <Scatter
-                        data={[{
-                            x: current,
-                            y: 0
-                        }]}
-                        fill='#ff0000'
-                    />
-                </ScatterChart>
-            </ResponsiveContainer>
+            <ParticlesChart
+                current={current}
+                data='alt'
+                max={50000}
+            />
+            <ParticlesChart
+                current={current}
+                data='d_alt'
+                max={20000}
+            />
+            <ParticlesChart
+                current={current}
+                data='dd_alt'
+                max={100}
+            />
+            <ParticlesChart
+                current={current}
+                data='radar_state'
+                max={2}
+            />
             <Slider
                 defaultValue={0}
                 onChange={handleDisplayParticles}

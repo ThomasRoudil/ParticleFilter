@@ -189,11 +189,8 @@ def compute_particle_filter(args):
         resample_proportion=0.002,
     )
 
-    tensor_particles = []
-    for plane_state in track:
-        pf.update(np.array([[plane_state.radar_observed]]))
-        tensor_particles.append(pf.particles)
-    return json.dumps([list(particles[:, 0]) for particles in tensor_particles])
+    particle_filters = [pf.update(np.array([[plane_state.radar_observed]])) for plane_state in track]
+    return json.dumps(particle_filters)
 
 
 @app.errorhandler(errors.APIError)

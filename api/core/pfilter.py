@@ -374,3 +374,12 @@ class ParticleFilter(object):
 
         self.resampled_particles = random_mask
         self.init_filter(mask=random_mask)
+
+        return {
+            'particles': {
+                'alt': list(self.particles[:, 0]),
+                'd_alt': list(self.particles[:, 1]),
+                'dd_alt': list(self.particles[:, 2]),
+                'radar_state': list(self.particles[:, 3]),
+            }
+        }
