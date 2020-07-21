@@ -147,7 +147,6 @@ def compute_particle_filter(args):
         radar_observed=0,
     )
 
-    np.random.seed(2026)  # reproducible seed!
     track = [plane]
 
     for i in range(500):
