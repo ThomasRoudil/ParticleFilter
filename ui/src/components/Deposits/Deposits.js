@@ -22,8 +22,8 @@ export default function Deposits() {
     const {simulation, setSimulation} = React.useContext(Context);
     const classes = useStyles();
     
-    const handleParticleFilter = () => {
-        api.post('/particle-filter', {
+    const handleNumpy = () => {
+        api.post('/particle-filter/numpy', {
             altitude_profile: simulation.altitude_profile
         })
             .then(response => {
@@ -33,7 +33,19 @@ export default function Deposits() {
                 })
             })
     };
-    
+
+    const handlePfilter = () => {
+        api.post('/particle-filter/pfilter', {
+            altitude_profile: simulation.altitude_profile
+        })
+            .then(response => {
+                setSimulation({
+                    ...simulation,
+                    tensor_particles: response.data
+                })
+            })
+    };
+
     return (
         <React.Fragment>
             <Title>Trajectory</Title>
@@ -47,9 +59,17 @@ export default function Deposits() {
                 variant='contained' 
                 color='secondary'
                 disabled={!simulation.filename || simulation.positions.length === 0}
-                onClick={handleParticleFilter}
+                onClick={handleNumpy}
             >
-                Compute particle filter
+                Compute PF (numpy)
+            </Button>
+            <Button
+                variant='contained'
+                color='secondary'
+                disabled={!simulation.filename || simulation.positions.length === 0}
+                onClick={handlePfilter}
+            >
+                Compute PF (pfilter)
             </Button>
         </React.Fragment>
     );
