@@ -7,7 +7,7 @@ import {makeStyles} from '@material-ui/core/styles';
 const useStyles = makeStyles((theme) => ({
     formControl: {
         marginBottom: theme.spacing(1),
-        minWidth: 120,
+        minWidth: 140,
         maxWidth: 200
     }
 }));
@@ -26,7 +26,9 @@ function SelectHeightmap() {
         setSimulation({
             ...simulation,
             filename: event.target.value,
-            positions: []
+            positions: [],
+            altitude_profile: [],
+            particle_filters: []
         });
     };
 

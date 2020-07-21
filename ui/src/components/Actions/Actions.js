@@ -3,8 +3,7 @@ import {api} from 'api';
 import {Title} from 'components';
 import {Context} from 'store/Simulation';
 import {makeStyles} from '@material-ui/core/styles';
-import {Button, Typography} from '@material-ui/core';
-
+import {Button, Grid, Typography} from '@material-ui/core';
 
 const useStyles = makeStyles({
     depositContext: {
@@ -18,30 +17,18 @@ const _getDistance = positions => {
     return (60 / 1081 * Math.sqrt(((positions[1].x - positions[0].x) * 1081 / clientWidth) ** 2 + ((positions[1].y - positions[0].y) * 1081 / clientHeight) ** 2)).toFixed(2);
 };
 
-export default function Deposits() {
+export default function Actions() {
     const {simulation, setSimulation} = React.useContext(Context);
     const classes = useStyles();
-    
-    const handleNumpy = () => {
-        api.post('/particle-filter/numpy', {
-            altitude_profile: simulation.altitude_profile
-        })
-            .then(response => {
-                setSimulation({
-                    ...simulation,
-                    tensor_particles: response.data
-                })
-            })
-    };
 
     const handlePfilter = () => {
-        api.post('/particle-filter/pfilter', {
+        api.post('/particle-filter', {
             altitude_profile: simulation.altitude_profile
         })
             .then(response => {
                 setSimulation({
                     ...simulation,
-                    tensor_particles: response.data
+                    particle_filters: response.data
                 })
             })
     };
@@ -55,22 +42,18 @@ export default function Deposits() {
             <Typography color='textSecondary' className={classes.depositContext}>
                 real distance
             </Typography>
-            <Button 
-                variant='contained' 
-                color='secondary'
-                disabled={!simulation.filename || simulation.positions.length === 0}
-                onClick={handleNumpy}
-            >
-                Compute PF (numpy)
-            </Button>
-            <Button
-                variant='contained'
-                color='secondary'
-                disabled={!simulation.filename || simulation.positions.length === 0}
-                onClick={handlePfilter}
-            >
-                Compute PF (pfilter)
-            </Button>
+            <Grid container spacing={2}>
+                <Grid item>
+                    <Button
+                        variant='contained'
+                        color='secondary'
+                        disabled={!simulation.filename || simulation.positions.length === 0}
+                        onClick={handlePfilter}
+                    >
+                        Particle filter
+                    </Button>
+                </Grid>
+            </Grid>
         </React.Fragment>
     );
 }

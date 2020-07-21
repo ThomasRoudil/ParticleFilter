@@ -16,7 +16,7 @@ export const ContextProvider = (props) => {
         simulation: {
             filename: null,
             positions: [],
-            tensor_particles: []
+            particle_filters: []
         },
         setSimulation: setSimulation
     };

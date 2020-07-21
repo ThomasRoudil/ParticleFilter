@@ -74,51 +74,16 @@ def compute_altitude_profile(args):
     return json.dumps(altitude_profile)
 
 
-@app.route('/particle-filter/numpy', methods=['POST'])
+@app.route('/particle-filter', methods=['POST'])
 @use_args({
     'altitude_profile': fields.List(fields.Int, required=True)
 })
-def compute_particle_filter_numpy(args):
-    altitude_profile = args['altitude_profile']
+def compute_particle_filter(args):
+    TURBULENCE = 700
+    dt = 1 / 10.0
 
-    N = 800
-    particles = np.random.uniform(0, TIME_STEPS, N)
-
-    tensor_particles = []
-    for plane_altitude in altitude_profile:
-        measures = np.array(list(map(lambda x: altitude_profile[int(x)], particles)))
-        weights = 1 / len(measures) * np.ones(len(measures))
-        weights = weights * (
-                    (1 / np.sqrt(2 * np.pi)) * np.exp(-((plane_altitude - measures) / max(altitude_profile)) ** 2 / 4))
-        weights = weights / np.sum(weights)
-
-        # Resample
-        weights_cumulative = np.cumsum(weights)
-        u = np.random.uniform(0, 1, N)
-        ind1 = np.argsort(np.append(u, weights_cumulative))
-        ind = np.array([i for i, x in enumerate(ind1) if x < N]) - np.arange(0, N)
-        particles = particles[ind]
-
-        # Save particles in tensor
-        tensor_particles.append([int(particle) for particle in particles])
-
-        # Dynamics
-        speed = 1
-        speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
-        particles = particles + speed_noise + speed
-        particles = np.array([min(particle, 499) for particle in particles])
-
-    return json.dumps(tensor_particles)
-
-
-@app.route('/particle-filter/pfilter', methods=['POST'])
-@use_args({
-    'altitude_profile': fields.List(fields.Int, required=True)
-})
-def compute_particle_filter_pfilter(args):
-    def simulate(state, dt):
-
-        turbulence = np.random.normal(0, 750)
+    def simulate(state):
+        turbulence = np.random.normal(0, TURBULENCE)
         radar_random = np.random.normal(0, state.radar_noise)
 
         # new flight level
@@ -152,7 +117,6 @@ def compute_particle_filter_pfilter(args):
             flightiness=state.flightiness,
         )
 
-    altitude_profile = args['altitude_profile']
     PlaneState = namedtuple(
         "PlaneState",
         [
@@ -170,8 +134,8 @@ def compute_particle_filter_pfilter(args):
     )
     max_dd_alt = 1000.0
 
-    my_plane = PlaneState(
-        alt=5000,
+    plane = PlaneState(
+        alt=10000,
         d_alt=0,
         dd_alt=0,
         flight_level=5000,
@@ -184,13 +148,11 @@ def compute_particle_filter_pfilter(args):
     )
 
     np.random.seed(2026)  # reproducible seed!
-    track = [my_plane]
+    track = [plane]
 
-    # simulate time to generate observations
-    # we will use radar_observed as our observation variable
     for i in range(500):
-        my_plane = simulate(my_plane, 1 / 10.0)
-        track.append(my_plane)
+        plane = simulate(plane)
+        track.append(plane)
 
     ## Very basic prior
     prior_fn = independent_sample(
@@ -202,16 +164,12 @@ def compute_particle_filter_pfilter(args):
         ]
     )
 
-    dt = 1 / 10.0
-
     def dynamics(x):
-        # super-simple: just integrate (Euler) acceleration and velocity
         x[:, 0] += x[:, 1] * dt
         x[:, 1] += x[:, 2] * dt
         return x
 
-    # we observe the true altitude, unless the radar is off
-    # then we observe 0
+    # we observe the true altitude, unless the radar is off then we observe 0
     def observe(x):
         return np.where(x[:, 3] < 0.5, 0, x[:, 0])
 
@@ -222,7 +180,6 @@ def compute_particle_filter_pfilter(args):
         x[:, 3] = np.abs(bernoulli(0.05).rvs(x[:, 3].shape) - x[:, 3])
         return x
 
-    # construct filter
     pf = ParticleFilter(
         prior_fn=prior_fn,
         observe_fn=observe,

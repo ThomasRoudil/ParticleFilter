@@ -1,9 +1,8 @@
 import React from 'react';
-import {Context} from "store/Simulation";
+import {Context} from 'store/Simulation';
+import {Title} from 'components';
+import {LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer} from 'recharts';
 import {useTheme} from '@material-ui/core/styles';
-import {LineChart, Line, Scatter, ScatterChart, XAxis, YAxis, Label, ResponsiveContainer} from 'recharts';
-import {Slider} from "@material-ui/core";
-import Title from '../Title/Title';
 
 // Generate Sales Data
 function createData(time, amount) {
@@ -13,11 +12,6 @@ function createData(time, amount) {
 export default function AltitudeChart() {
     const {simulation} = React.useContext(Context);
     const theme = useTheme();
-
-    const [current, setCurrent] = React.useState(0);
-    const handleDisplayParticles = (event, value) => {
-        setCurrent(value)
-    };
 
     if (!simulation.altitude_profile) return null;
 
@@ -47,43 +41,6 @@ export default function AltitudeChart() {
                     <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false}/>
                 </LineChart>
             </ResponsiveContainer>
-            <ResponsiveContainer>
-                <ScatterChart
-                    width={400}
-                    height={400}
-                    margin={{
-                        top: 20, right: 20, bottom: 20, left: 20,
-                    }}
-                >
-                    <XAxis stroke={theme.palette.text.secondary} type="number" dataKey="x" domain={[0, 500]} />
-                    <YAxis stroke={theme.palette.text.secondary} type="number" dataKey="y"/>
-                    <Scatter
-                        data={simulation.tensor_particles[current] && simulation.tensor_particles[current].map(value => {
-                            return {
-                                x: value,
-                                y: 100 + Math.random() * 100
-                            }
-                        })}
-                        fill="#8884d8"
-                    />
-                    <Scatter
-                        data={[{
-                            x: current,
-                            y: 0
-                        }]}
-                        fill="#ff0000"
-                    />
-                </ScatterChart>
-            </ResponsiveContainer>
-            <Slider
-                defaultValue={0}
-                onChange={handleDisplayParticles}
-                step={1}
-                marks
-                min={0}
-                max={500}
-                disabled={!simulation.tensor_particles || simulation.tensor_particles.length === 0}
-            />
         </React.Fragment>
     );
 }

@@ -140,9 +140,7 @@ function Heightmap() {
         let canvas = canvasRef.current;
         _reset(canvas);
         if (p1) {
-        }
-
-        else if (simulation.positions.length > 0) {
+        } else if (simulation.positions.length > 0) {
             _drawLine(canvas, simulation.positions[0], simulation.positions[1], "#6bb3db");
         }
     };
@@ -153,7 +151,7 @@ function Heightmap() {
                 className={classes.img}
                 ref={imageRef}
                 onDragStart={event => event.preventDefault()}
-                src={`http://localhost:9000/get-heightmap/${simulation.filename}`}
+                src={simulation.filename ? `http://localhost:9000/get-heightmap/${simulation.filename}` : ''}
                 alt='Heightmap'
             />
             <canvas

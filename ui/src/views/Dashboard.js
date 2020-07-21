@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import {Context} from "store/Simulation";
 import {FreeCamera, Color3, Vector3, HemisphericLight, MeshBuilder, StandardMaterial, Texture} from '@babylonjs/core';
-import {AltitudeChart, Deposits, Heightmap, Scene, SelectHeightmap} from 'components';
+import {AltitudeChart, Actions, Heightmap, Loader, ParticleFilter, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
 
 import {
@@ -108,6 +108,7 @@ const useStyles = makeStyles((theme) => ({
         paddingBottom: theme.spacing(4),
     },
     paper: {
+        position: 'relative',
         padding: theme.spacing(2),
         display: 'flex',
         overflow: 'hidden',
@@ -158,6 +159,8 @@ export default function Dashboard() {
 
     const [sceneState, setSceneState] = React.useState();
     const [ground, setGround] = React.useState('');
+
+    const [loadingScene, setLoadingScene] = React.useState(true);
 
     React.useEffect(() => {
         if (simulation.filename) {
@@ -267,17 +270,19 @@ export default function Dashboard() {
                 <Container maxWidth="lg" className={classes.container}>
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={4}>
-                            <Paper className={classes.paper}>
-                                <SelectHeightmap/>
+                            <SelectHeightmap/>
+                            <Paper className={clsx({[classes.paper]: true, transition: true, hide: !simulation.filename})}>
                                 <Heightmap/>
                             </Paper>
                         </Grid>
-                        <Grid item xs={12} md={8}>
+                        <Grid item xs={12} md={8} className={clsx({transition: true, hide: !simulation.filename})}>
                             <Paper className={classes.paper}>
+                                <Loader open={loadingScene}/>
                                 <Scene
                                     antialias
                                     onSceneReady={scene => {
                                         setSceneState(scene);
+                                        setLoadingScene(false);
                                         onSceneReady(scene, simulation.filename)
                                     }}
                                     onRender={onRender}
@@ -285,13 +290,24 @@ export default function Dashboard() {
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={8} lg={9}>
-                            <Paper className={fixedHeightPaper}>
+                            <Paper
+                                className={clsx({[fixedHeightPaper]: true, transition: true, hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0})}
+                            >
                                 <AltitudeChart/>
                             </Paper>
                         </Grid>
                         <Grid item xs={12} md={4} lg={3}>
-                            <Paper className={fixedHeightPaper}>
-                                <Deposits/>
+                            <Paper
+                                className={clsx({[fixedHeightPaper]: true, transition: true, hide: !simulation.positions || simulation.positions.length === 0})}
+                            >
+                                <Actions/>
+                            </Paper>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Paper
+                                className={clsx({[fixedHeightPaper]: true, transition: true, hide: !simulation.particle_filters || simulation.particle_filters.length === 0})}
+                            >
+                                <ParticleFilter/>
                             </Paper>
                         </Grid>
                     </Grid>
