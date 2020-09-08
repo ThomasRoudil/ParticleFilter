@@ -2,11 +2,12 @@ import cv2
 import heapq
 import random
 import os
-from config import Config
+import numpy as np
+from src.config import Config
 from scipy.ndimage.interpolation import map_coordinates
 
-TIME_STEPS = 15
-PARTICLES_COUNT = 40
+TIME_STEPS = 30
+PARTICLES_COUNT = 100
 
 
 def _generate_trajectory(p1, p2):
@@ -29,11 +30,12 @@ def _get_heightmap(filename):
 class Particle(dict):
     def __init__(self, x=None, y=None, filename=None, position=None):
         super().__init__()
-        self['x'] = round(x, 2) if x else position[0] + random.randint(0, 50)
-        self['y'] = round(y, 2) if y else position[1] + random.randint(0, 50)
+        self['x'] = round(x, 2) if x else position[0] + random.randint(-10, 10)
+        self['y'] = round(y, 2) if y else position[1] + random.randint(-10, 10)
         # Constraints between 0, 1000
         self['x'] = min(max(self['x'], 0), 1000)
         self['y'] = min(max(self['y'], 0), 1000)
+        self['w'] = round(1/PARTICLES_COUNT)
 
         if filename:
             heightmap = _get_heightmap(filename)
@@ -67,20 +69,25 @@ def get_tensor_particles(filename, positions):
     tensor_particles = [particles]
 
     # Update particles and store each step in tensor
-    for position in trajectory:
-        particles = update_particles(particles, filename, position=position, direction=direction)
+    for index, position in enumerate(trajectory):
+        particles = update_particles(particles, filename, position=position, direction=direction, index=index)
         tensor_particles.append(particles)
-
     return tensor_particles
 
 
-def update_particles(particles, filename, position, direction):
+# def compute_weights(particles, w):
+#     delta_heights = list(map(lambda x: x['delta_height'], particles))
+#     for particle in particles:
+#         particle['w'] = particle['w'] * np.exp(-1/2 * (delta_heights[particle]) ** 2)/np.sqrt(2 * np.pi)
+
+
+def update_particles(particles, filename, position, direction, index):
     def move_particles(particles, direction):
         for particle in particles:
-            particle['x'] = round(particle['x'] + direction[0] / TIME_STEPS, 2)
-            particle['y'] = round(particle['y'] + direction[1] / TIME_STEPS, 2)
+            particle['x'] = round(particle['x'] + direction[0] / TIME_STEPS, 2) + random.randint(-5, 5)
+            particle['y'] = round(particle['y'] + direction[1] / TIME_STEPS, 2) + random.randint(-5, 5)
 
-    split_ratio = 0.4
+    split_ratio = 0.8
     split_index = int(split_ratio * len(particles))
 
     delta_heights = list(map(lambda x: x['delta_height'], particles))
@@ -91,8 +98,8 @@ def update_particles(particles, filename, position, direction):
     new_particles = [random.choice(weighted_particles) for _ in particles[split_index:]]
     new_particles = [
         Particle(
-            x=particle['x'] + random.randint(-15, 15),
-            y=particle['y'] + random.randint(-15, 15),
+            x=particle['x'] + random.randint(-5, 5),
+            y=particle['y'] + random.randint(-5, 5),
             filename=filename,
             position=position
         ) for particle in new_particles]

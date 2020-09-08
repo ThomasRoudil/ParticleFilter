@@ -1,8 +1,8 @@
 import json
 import os
 import random
-from NFP import core
-from config import Config
+from src.NFP import core
+from src.config import Config
 from flask import Flask, render_template, request, send_file
 
 app = Flask(__name__, template_folder=os.path.abspath('../ui/templates'))
