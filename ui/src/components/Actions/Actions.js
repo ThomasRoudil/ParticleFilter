@@ -28,7 +28,7 @@ export default function Actions() {
             .then(response => {
                 setSimulation({
                     ...simulation,
-                    particle_filters: response.data
+                    tensor_particles: response.data
                 })
             })
     };

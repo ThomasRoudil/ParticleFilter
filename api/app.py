@@ -13,7 +13,6 @@ from webargs.flaskparser import use_args
 
 from api import errors
 from api.config import NPF
-from api.core.pfilter import ParticleFilter, independent_sample, cauchy_noise, squared_error
 
 app = Flask(__name__)
 CORS(app)
@@ -79,118 +78,36 @@ def compute_altitude_profile(args):
     'altitude_profile': fields.List(fields.Int, required=True)
 })
 def compute_particle_filter(args):
-    TURBULENCE = 700
-    dt = 1 / 10.0
+    altitude_profile = args['altitude_profile']
 
-    def simulate(state):
-        turbulence = np.random.normal(0, TURBULENCE)
-        radar_random = np.random.normal(0, state.radar_noise)
+    N = 200
+    particles = np.random.uniform(0, TIME_STEPS, N)
 
-        # new flight level
-        if np.random.uniform() < 1 - np.exp(-state.flightiness * dt):
-            flight_level = np.random.uniform(1000, 30000)
-        else:
-            flight_level = state.flight_level
+    tensor_particles = []
+    for plane_altitude in altitude_profile:
+        measures = np.array(list(map(lambda x: altitude_profile[int(x)], particles)))
+        weights = 1 / len(measures) * np.ones(len(measures))
+        weights = weights * (
+                (1 / np.sqrt(2 * np.pi)) * np.exp(-((plane_altitude - measures) / max(altitude_profile)) ** 2 / 4))
+        weights = weights / np.sum(weights)
 
-        # random radar fluctuations, using a Gilbert markov model (i.e. switching on and off)
-        radar_state = state.radar_state
-        if state.radar_state == 0:
-            if np.random.uniform() < 1 - np.exp(-state.radar_p * dt):
-                radar_state = 1
+        # Resample
+        weights_cumulative = np.cumsum(weights)
+        u = np.random.uniform(0, 1, N)
+        ind1 = np.argsort(np.append(u, weights_cumulative))
+        ind = np.array([i for i, x in enumerate(ind1) if x < N]) - np.arange(0, N)
+        particles = particles[ind]
 
-        if state.radar_state == 1:
-            if np.random.uniform() < 1 - np.exp(-state.radar_q * dt):
-                radar_state = 0
+        # Save particles in tensor
+        tensor_particles.append([int(particle) for particle in particles])
 
-        drag = 0.9
-        # integrate and return
-        return PlaneState(
-            alt=state.alt + state.d_alt * dt,
-            d_alt=(state.d_alt + state.dd_alt * dt + turbulence) * drag,
-            dd_alt=np.clip(flight_level - state.alt, -max_dd_alt, max_dd_alt),
-            radar_observed=(state.alt + radar_random) * radar_state,
-            flight_level=flight_level,
-            radar_state=radar_state,
-            radar_noise=state.radar_noise,
-            radar_p=state.radar_p,
-            radar_q=state.radar_q,
-            flightiness=state.flightiness,
-        )
+        # Dynamics
+        speed = 1
+        speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
+        particles = particles + speed_noise + speed
+        particles = np.array([min(particle, 499) for particle in particles])
 
-    PlaneState = namedtuple(
-        "PlaneState",
-        [
-            "alt",  # altitude
-            "d_alt",  # velocity
-            "dd_alt",  # acceleration
-            "flight_level",  # current intended flight level
-            "radar_state",  # radar contact or not?
-            "flightiness",  # how often plane changes flight levels, avg. changes per second
-            "radar_noise",  # noise level in measurement
-            "radar_p",  # probability of radar making contact, per sectond
-            "radar_q",  # probability of radar losing contact, per second
-            "radar_observed",  # observation from radar
-        ],
-    )
-    max_dd_alt = 1000.0
-
-    plane = PlaneState(
-        alt=10000,
-        d_alt=0,
-        dd_alt=0,
-        flight_level=5000,
-        radar_state=1,
-        radar_p=0.05,
-        radar_q=0.1,
-        flightiness=0.01,
-        radar_noise=1500,
-        radar_observed=0,
-    )
-
-    track = [plane]
-
-    for i in range(500):
-        plane = simulate(plane)
-        track.append(plane)
-
-    ## Very basic prior
-    prior_fn = independent_sample(
-        [
-            norm(loc=0, scale=20000).rvs,  # altitude
-            norm(loc=0, scale=50).rvs,  # velocity
-            norm(loc=0, scale=3).rvs,  # acceleration
-            bernoulli(0.5).rvs,  # radar state
-        ]
-    )
-
-    def dynamics(x):
-        x[:, 0] += x[:, 1] * dt
-        x[:, 1] += x[:, 2] * dt
-        return x
-
-    # we observe the true altitude, unless the radar is off then we observe 0
-    def observe(x):
-        return np.where(x[:, 3] < 0.5, 0, x[:, 0])
-
-    def noise_fn(x):
-        # random diffusion
-        x[:, :3] = cauchy_noise(x[:, :3], sigmas=[0.1, 60, 0.1])
-        # occasional switches in expected radar state
-        x[:, 3] = np.abs(bernoulli(0.05).rvs(x[:, 3].shape) - x[:, 3])
-        return x
-
-    pf = ParticleFilter(
-        prior_fn=prior_fn,
-        observe_fn=observe,
-        n_particles=100,
-        dynamics_fn=dynamics,
-        noise_fn=noise_fn,
-        weight_fn=lambda x, y: squared_error(x, y, sigma=5000),
-        resample_proportion=0.002,
-    )
-
-    particle_filters = [pf.update(np.array([[plane_state.radar_observed]])) for plane_state in track]
-    return json.dumps(particle_filters)
+    return json.dumps(tensor_particles)
 
 
 @app.errorhandler(errors.APIError)

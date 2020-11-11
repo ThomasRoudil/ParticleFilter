@@ -28,7 +28,7 @@ function SelectHeightmap() {
             filename: event.target.value,
             positions: [],
             altitude_profile: [],
-            particle_filters: []
+            tensor_particles: []
         });
     };
 

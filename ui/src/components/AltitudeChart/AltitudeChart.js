@@ -1,7 +1,7 @@
 import React from 'react';
 import {Context} from 'store/Simulation';
 import {Title} from 'components';
-import {LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer} from 'recharts';
+import {LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer, Tooltip} from 'recharts';
 import {useTheme} from '@material-ui/core/styles';
 
 // Generate Sales Data
@@ -35,10 +35,11 @@ export default function AltitudeChart() {
                             position="left"
                             style={{textAnchor: 'middle', fill: theme.palette.text.primary}}
                         >
-                            Altitude (m)
+                            Altitude
                         </Label>
                     </YAxis>
                     <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false}/>
+                    <Tooltip />
                 </LineChart>
             </ResponsiveContainer>
         </React.Fragment>

@@ -305,7 +305,7 @@ export default function Dashboard() {
                         </Grid>
                         <Grid item xs={12} style={{height: 400}}>
                             <Paper
-                                className={clsx({transition: true, hide: !simulation.particle_filters || simulation.particle_filters.length === 0})}
+                                className={clsx({transition: true, hide: !simulation.tensor_particles || simulation.tensor_particles.length === 0})}
                                 style={{height: 100}}
                             >
                                 <ParticleFilter/>
