@@ -80,7 +80,7 @@ def compute_altitude_profile(args):
 def compute_particle_filter(args):
     altitude_profile = args['altitude_profile']
 
-    N = 200
+    N = 400
     particles = np.random.uniform(0, TIME_STEPS, N)
 
     tensor_particles = []
@@ -103,7 +103,7 @@ def compute_particle_filter(args):
 
         # Dynamics
         speed = 1
-        speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
+        speed_noise = 0.25 * np.random.uniform(-1, 1, len(particles))
         particles = particles + speed_noise + speed
         particles = np.array([min(particle, 499) for particle in particles])
 

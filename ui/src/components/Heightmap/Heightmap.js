@@ -99,7 +99,7 @@ function Heightmap() {
             p2 = _getOffset(event);
             _drawLine(canvas, p1, p2, "#6bb3db");
         } else {
-            _drawCursor(canvas, _getOffset(event))
+            _drawCursor(canvas, _getOffset(event));
 
             if (simulation.positions.length > 0) {
                 _drawLine(canvas, simulation.positions[0], simulation.positions[1], "#6bb3db");

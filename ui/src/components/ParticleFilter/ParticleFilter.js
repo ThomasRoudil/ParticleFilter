@@ -3,9 +3,20 @@ import {Title} from 'components';
 import {Context} from 'store/Simulation';
 import {useTheme} from '@material-ui/core/styles';
 import {Slider} from '@material-ui/core';
-import {ResponsiveContainer, Scatter, ScatterChart, XAxis, YAxis} from 'recharts';
+import {Line, LineChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from 'recharts';
 
+function getStandardDeviation(array) {
+    const n = array.length;
+    const mean = array.reduce((a, b) => a + b) / n;
+    return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
+}
 
+function createData(index, particles) {
+    return {
+        index,
+        deviation: getStandardDeviation(particles)
+    };
+}
 
 export default function ParticleFilter() {
     const {simulation} = React.useContext(Context);
@@ -19,16 +30,13 @@ export default function ParticleFilter() {
     return (
         <React.Fragment>
             <Title>Particle filter</Title>
-            <ResponsiveContainer>
-                <ScatterChart
-                    width={400}
-                    height={400}
-                    margin={{
-                        top: 20, right: 20, bottom: 20, left: 20,
-                    }}
-                >
-                    <XAxis stroke={theme.palette.text.secondary} type="number" dataKey="x" domain={[0, 500]} />
-                    <YAxis stroke={theme.palette.text.secondary} type="number" dataKey="y"/>
+
+            <ResponsiveContainer
+                height={150}
+            >
+                <ScatterChart>
+                    <XAxis stroke={theme.palette.text.secondary} type="number" dataKey="x" domain={[0, 500]}/>
+                    <YAxis stroke={theme.palette.text.secondary} type="number" dataKey="y" width={0}/>
                     <Scatter
                         data={simulation.tensor_particles[current] && simulation.tensor_particles[current].map(value => {
                             return {
@@ -56,6 +64,21 @@ export default function ParticleFilter() {
                 max={500}
                 disabled={!simulation.tensor_particles || simulation.tensor_particles.length === 0}
             />
+
+            <ResponsiveContainer
+                height={300}
+            >
+                <LineChart
+                    data={simulation.tensor_particles.map((particles, index) => createData(index, particles))}
+                >
+                    <XAxis stroke={theme.palette.text.secondary}/>
+                    <YAxis stroke={theme.palette.text.secondary} width={40}/>
+                    <Line type="monotone" dataKey="deviation" stroke={theme.palette.primary.main} dot={false}/>
+                    <Line type="monotone" dataKey="result" stroke={theme.palette.primary.main} dot={false}/>
+                    <Tooltip/>
+                </LineChart>
+            </ResponsiveContainer>
+
         </React.Fragment>
     );
 }

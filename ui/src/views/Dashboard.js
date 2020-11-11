@@ -1,8 +1,8 @@
 import React from 'react';
 import clsx from 'clsx';
 import {Context} from "store/Simulation";
-import {FreeCamera, Color3, Vector3, HemisphericLight, MeshBuilder, StandardMaterial, Texture} from '@babylonjs/core';
-import {AltitudeChart, Actions, Heightmap, Loader, ParticleFilter, Scene, SelectHeightmap} from 'components';
+import {Color3, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3} from '@babylonjs/core';
+import {Actions, AltitudeChart, Heightmap, Loader, ParticleFilter, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
 
 import {
@@ -16,7 +16,6 @@ import {
     IconButton,
     Link,
     List,
-    Paper,
     Toolbar,
     Typography
 } from "@material-ui/core";
@@ -271,45 +270,52 @@ export default function Dashboard() {
                     <Grid container spacing={3}>
                         <Grid item xs={12} md={4}>
                             <SelectHeightmap/>
-                            <Paper className={clsx({[classes.paper]: true, transition: true, hide: !simulation.filename})}>
+                            <div
+                                className={clsx({transition: true, hide: !simulation.filename})}
+                            >
                                 <Heightmap/>
-                            </Paper>
+                            </div>
                         </Grid>
                         <Grid item xs={12} md={8} className={clsx({transition: true, hide: !simulation.filename})}>
-                            <Paper className={classes.paper}>
-                                <Loader open={loadingScene}/>
-                                <Scene
-                                    antialias
-                                    onSceneReady={scene => {
-                                        setSceneState(scene);
-                                        setLoadingScene(false);
-                                        onSceneReady(scene, simulation.filename)
-                                    }}
-                                    onRender={onRender}
-                                />
-                            </Paper>
+                            <Loader open={loadingScene}/>
+                            <Scene
+                                antialias
+                                onSceneReady={scene => {
+                                    setSceneState(scene);
+                                    setLoadingScene(false);
+                                    onSceneReady(scene, simulation.filename)
+                                }}
+                                onRender={onRender}
+                            />
                         </Grid>
-                        <Grid item xs={12} md={8} lg={9}>
-                            <Paper
-                                className={clsx({[fixedHeightPaper]: true, transition: true, hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0})}
-                            >
-                                <AltitudeChart/>
-                            </Paper>
+                        <Grid className={clsx({
+                            [fixedHeightPaper]: true,
+                            transition: true,
+                            hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0
+                        })} item xs={12} md={8} lg={9}>
+                            <AltitudeChart/>
                         </Grid>
-                        <Grid item xs={12} md={4} lg={3}>
-                            <Paper
-                                className={clsx({[fixedHeightPaper]: true, transition: true, hide: !simulation.positions || simulation.positions.length === 0})}
-                            >
-                                <Actions/>
-                            </Paper>
+                        <Grid
+                            className={clsx({
+                                transition: true,
+                                hide: !simulation.positions || simulation.positions.length === 0
+                            })}
+                            item
+                            xs={12}
+                            md={4}
+                            lg={3}>
+                            <Actions/>
                         </Grid>
-                        <Grid item xs={12} style={{height: 400}}>
-                            <Paper
-                                className={clsx({transition: true, hide: !simulation.tensor_particles || simulation.tensor_particles.length === 0})}
-                                style={{height: 100}}
-                            >
-                                <ParticleFilter/>
-                            </Paper>
+                        <Grid
+                            className={clsx({
+                                transition: true,
+                                hide: !simulation.tensor_particles || simulation.tensor_particles.length === 0
+                            })}
+                            item
+                            xs={12}
+                            style={{height: 400}}
+                        >
+                            <ParticleFilter/>
                         </Grid>
                     </Grid>
                     <Box pt={4}>

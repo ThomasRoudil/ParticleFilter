@@ -1,12 +1,11 @@
 import React from 'react';
 import {Context} from 'store/Simulation';
 import {Title} from 'components';
-import {LineChart, Line, XAxis, YAxis, Label, ResponsiveContainer, Tooltip} from 'recharts';
+import {Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {useTheme} from '@material-ui/core/styles';
 
-// Generate Sales Data
-function createData(time, amount) {
-    return {time, amount};
+function createData(time, altitude) {
+    return {time, altitude};
 }
 
 export default function AltitudeChart() {
@@ -21,25 +20,11 @@ export default function AltitudeChart() {
             <ResponsiveContainer>
                 <LineChart
                     data={simulation.altitude_profile.map((altitude, index) => createData(index, altitude))}
-                    margin={{
-                        top: 16,
-                        right: 16,
-                        bottom: 0,
-                        left: 24,
-                    }}
                 >
-                    <XAxis stroke={theme.palette.text.secondary}/>
-                    <YAxis stroke={theme.palette.text.secondary}>
-                        <Label
-                            angle={270}
-                            position="left"
-                            style={{textAnchor: 'middle', fill: theme.palette.text.primary}}
-                        >
-                            Altitude
-                        </Label>
-                    </YAxis>
-                    <Line type="monotone" dataKey="amount" stroke={theme.palette.primary.main} dot={false}/>
-                    <Tooltip />
+                    <XAxis stroke={theme.palette.text.secondary} width={40}/>
+                    <YAxis stroke={theme.palette.text.secondary}/>
+                    <Line type="monotone" dataKey="altitude" stroke={theme.palette.primary.main} dot={false}/>
+                    <Tooltip/>
                 </LineChart>
             </ResponsiveContainer>
         </React.Fragment>
