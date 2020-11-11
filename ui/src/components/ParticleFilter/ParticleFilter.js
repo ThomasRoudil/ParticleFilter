@@ -3,19 +3,16 @@ import {Title} from 'components';
 import {Context} from 'store/Simulation';
 import {useTheme} from '@material-ui/core/styles';
 import {Slider} from '@material-ui/core';
-import {Line, LineChart, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from 'recharts';
+import {ComposedChart, Line, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from 'recharts';
 
-function getStandardDeviation(array) {
+function getStandardDeviation(array) {  // how particles are far from each other
     const n = array.length;
     const mean = array.reduce((a, b) => a + b) / n;
     return Math.sqrt(array.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / n);
 }
 
-function createData(index, particles) {
-    return {
-        index,
-        deviation: getStandardDeviation(particles)
-    };
+function getAverageDeviation(array, index) {  // how particles are far from the plane
+    return array.filter(particle => particle <= index + 10 && particle >= index - 10).length
 }
 
 export default function ParticleFilter() {
@@ -68,15 +65,19 @@ export default function ParticleFilter() {
             <ResponsiveContainer
                 height={300}
             >
-                <LineChart
-                    data={simulation.tensor_particles.map((particles, index) => createData(index, particles))}
+                <ComposedChart
+                    data={simulation.tensor_particles.map((particles, index) => ({
+                        index,
+                        deviation: getStandardDeviation(particles),
+                        result: getAverageDeviation(particles, index)
+                    }))}
                 >
                     <XAxis stroke={theme.palette.text.secondary}/>
                     <YAxis stroke={theme.palette.text.secondary} width={40}/>
                     <Line type="monotone" dataKey="deviation" stroke={theme.palette.primary.main} dot={false}/>
-                    <Line type="monotone" dataKey="result" stroke={theme.palette.primary.main} dot={false}/>
+                    <Line type="monotone" dataKey="result" stroke="#82ca9d" dot={false}/>
                     <Tooltip/>
-                </LineChart>
+                </ComposedChart>
             </ResponsiveContainer>
 
         </React.Fragment>
