@@ -16,7 +16,7 @@ function Loader(props) {
 
     return (
         <Backdrop className={classes.backdrop} open={open}>
-            <CircularProgress color='primary'/>
+            <CircularProgress color='secondary'/>
         </Backdrop>
     )
 }

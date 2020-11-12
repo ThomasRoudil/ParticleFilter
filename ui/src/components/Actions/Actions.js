@@ -22,9 +22,12 @@ export default function Actions() {
     const {simulation, setSimulation} = React.useContext(Simulation);
     const classes = useStyles();
 
+    const {setLoading} = useLoading();
+
     const [count, setCount] = useState(200);
 
     const handlePfilter = () => {
+        setLoading(true)
         api.post('/particle-filter', {
             altitude_profile: simulation.altitude_profile,
             particles_count: count
@@ -35,6 +38,7 @@ export default function Actions() {
                     tensor_particles: response.data
                 })
             })
+            .finally(() => setLoading(false))
     };
 
     return (

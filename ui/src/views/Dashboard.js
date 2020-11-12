@@ -1,10 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import clsx from 'clsx';
 import {Simulation} from "store/Simulation";
 import {Color3, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3} from '@babylonjs/core';
 import {Actions, AltitudeChart, Heightmap, Loader, ParticleFilter, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
-
 import {
     AppBar,
     Box,
@@ -16,9 +15,10 @@ import {
     IconButton,
     Link,
     List,
+    Switch,
     Toolbar,
     Typography
-} from "@material-ui/core";
+} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import MenuIcon from '@material-ui/icons/Menu';
@@ -156,13 +156,15 @@ export default function Dashboard() {
     const {simulation} = React.useContext(Simulation);
     const classes = useStyles();
 
-    const [sceneState, setSceneState] = React.useState();
+    const [sceneState, setSceneState] = useState();
     const [ground, setGround] = React.useState('');
 
-    const [loadingScene, setLoadingScene] = React.useState(true);
+    const [loadingScene, setLoadingScene] = useState(true);
 
-    React.useEffect(() => {
-        if (simulation.filename) {
+    const [toggleScene, setToggleScene] = useState(false);
+
+    useEffect(() => {
+        if (simulation.filename && toggleScene) {
             if (ground) {
                 ground.isVisible = false;
             }
@@ -183,10 +185,10 @@ export default function Dashboard() {
                 setGround(local_ground)
             }, 20)
         }
-    }, [simulation.filename]);
+    }, [simulation.filename, toggleScene]);
 
-    React.useEffect(() => {
-        if (simulation.positions && simulation.positions.length > 0) {
+    useEffect(() => {
+        if (simulation.positions && simulation.positions.length > 0 && toggleScene) {
 
             // Compute babylon space location
             let clientWidth = document.querySelector('img').clientWidth;
@@ -215,10 +217,10 @@ export default function Dashboard() {
             }, sceneState);
             lines.color = Color3.FromHexString('#6bb3db')
         }
-    }, [simulation.positions]);
+    }, [simulation.positions, toggleScene]);
 
 
-    const [open, setOpen] = React.useState(false);
+    const [open, setOpen] = useState(false);
     const handleDrawerOpen = () => {
         setOpen(true);
     };
@@ -273,9 +275,21 @@ export default function Dashboard() {
                             <div
                                 className={clsx({transition: true, hide: !simulation.filename})}
                             >
+                                <Typography
+                                    variant='caption'
+                                >
+                                    ENABLE 3D VIEW
+                                </Typography>
+                                <Switch
+                                    checked={toggleScene}
+                                    onChange={() => setToggleScene(true)}
+                                    name="toggle_scene"
+                                />
+
                                 <Heightmap/>
                             </div>
                         </Grid>
+                        {toggleScene &&
                         <Grid item xs={12} md={8} className={clsx({transition: true, hide: !simulation.filename})}>
                             <Loader open={loadingScene}/>
                             <Scene
@@ -287,7 +301,7 @@ export default function Dashboard() {
                                 }}
                                 onRender={onRender}
                             />
-                        </Grid>
+                        </Grid>}
                         <Grid className={clsx({
                             [fixedHeightPaper]: true,
                             transition: true,
