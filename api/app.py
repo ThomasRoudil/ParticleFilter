@@ -1,13 +1,12 @@
-import cv2
 import json
-import numpy as np
 import os
 
-from collections import namedtuple
+import cv2
+import numpy as np
 from flask import Flask, send_file
 from flask_cors import CORS
+from numpy.random import random
 from scipy.ndimage.interpolation import map_coordinates
-from scipy.stats import norm, bernoulli
 from webargs import fields
 from webargs.flaskparser import use_args
 
@@ -76,13 +75,16 @@ def compute_altitude_profile(args):
 @app.route('/particle-filter', methods=['POST'])
 @use_args({
     'altitude_profile': fields.List(fields.Int, required=True),
-    'particles_count': fields.Int(required=True)
+    'particles_count': fields.Int(required=True),
+    'resampling_method': fields.Str(required=True)
 })
 def compute_particle_filter(args):
     altitude_profile = args['altitude_profile']
 
     N = args['particles_count']
     particles = np.random.uniform(0, TIME_STEPS, N)
+
+    resampling_method = args['resampling_method']
 
     tensor_particles = []
     for plane_altitude in altitude_profile:
@@ -95,10 +97,16 @@ def compute_particle_filter(args):
         # Resample
         weights_cumulative = np.cumsum(weights)
         weights_cumulative[-1] = 1
-        u = np.random.uniform(0, 1, N)
-        ind1 = np.argsort(np.append(u, weights_cumulative))
-        ind = np.array([i for i, x in enumerate(ind1) if x < N]) - np.arange(0, N)
-        particles = particles[ind]
+
+        if resampling_method == 'normal':
+            u = np.random.uniform(0, 1, N)
+            ind = np.argsort(np.append(u, weights_cumulative))
+            indexes = np.array([i for i, x in enumerate(ind) if x < N]) - np.arange(0, N)
+
+        elif resampling_method == 'multinomial':
+            indexes = np.searchsorted(weights_cumulative, random(len(weights)))
+
+        particles = particles[indexes]
 
         # Save particles in tensor
         tensor_particles.append([int(particle) for particle in particles])

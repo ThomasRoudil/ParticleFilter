@@ -4,7 +4,7 @@ import {Title} from 'components';
 import {useLoading} from 'hooks';
 import {Simulation} from 'store/Simulation';
 import {makeStyles} from '@material-ui/core/styles';
-import {Button, Grid, Slider, Typography} from '@material-ui/core';
+import {Button, Grid, MenuItem, Select, Slider, Typography} from '@material-ui/core';
 
 const useStyles = makeStyles({
     flex: {
@@ -27,12 +27,14 @@ export default function Actions() {
     const {setLoading} = useLoading();
 
     const [count, setCount] = useState(200);
+    const [method, setMethod] = useState('normal');
 
     const handlePfilter = () => {
         setLoading(true)
         api.post('/particle-filter', {
             altitude_profile: simulation.altitude_profile,
-            particles_count: count
+            particles_count: count,
+            resampling_method: method
         })
             .then(response => {
                 setSimulation({
@@ -82,6 +84,27 @@ export default function Actions() {
                     max={1000}
                     onChange={(event, value) => setCount(value)}
                 />
+                <Typography color='textPrimary'>
+                    Resampling :&nbsp;
+                    <Typography
+                        component='span'
+                        style={{fontWeight: 'bold'}}
+                    >
+                        {method}
+                    </Typography>
+                </Typography>
+                <Select
+                    label={method}
+                    value={method}
+                    onChange={event => setMethod(event.target.value)}
+                    small
+                    variant='outlined'
+                >
+                    {['normal', 'multinomial'].map(method => (
+                        <MenuItem key={method} value={method}>{method}</MenuItem>
+                    ))}
+                </Select>
+
             </Grid>
             <Grid item xs={12}>
                 <Button
