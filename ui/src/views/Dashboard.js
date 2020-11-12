@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import {Context} from "store/Simulation";
+import {Simulation} from "store/Simulation";
 import {Color3, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3} from '@babylonjs/core';
 import {Actions, AltitudeChart, Heightmap, Loader, ParticleFilter, Scene, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
@@ -153,7 +153,7 @@ const onRender = scene => {
 
 
 export default function Dashboard() {
-    const {simulation} = React.useContext(Context);
+    const {simulation} = React.useContext(Simulation);
     const classes = useStyles();
 
     const [sceneState, setSceneState] = React.useState();

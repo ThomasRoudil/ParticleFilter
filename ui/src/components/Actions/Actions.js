@@ -1,12 +1,13 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {api} from 'api';
 import {Title} from 'components';
-import {Context} from 'store/Simulation';
+import {useLoading} from 'hooks';
+import {Simulation} from 'store/Simulation';
 import {makeStyles} from '@material-ui/core/styles';
-import {Button, Grid, Typography} from '@material-ui/core';
+import {Button, Grid, Slider, Typography} from '@material-ui/core';
 
 const useStyles = makeStyles({
-    depositContext: {
+    flex: {
         flex: 1,
     },
 });
@@ -18,12 +19,15 @@ const _getDistance = positions => {
 };
 
 export default function Actions() {
-    const {simulation, setSimulation} = React.useContext(Context);
+    const {simulation, setSimulation} = React.useContext(Simulation);
     const classes = useStyles();
+
+    const [count, setCount] = useState(200);
 
     const handlePfilter = () => {
         api.post('/particle-filter', {
-            altitude_profile: simulation.altitude_profile
+            altitude_profile: simulation.altitude_profile,
+            particles_count: count
         })
             .then(response => {
                 setSimulation({
@@ -34,26 +38,47 @@ export default function Actions() {
     };
 
     return (
-        <React.Fragment>
-            <Title>Trajectory</Title>
-            <Typography component='p' variant='h4'>
-                {simulation.positions.length > 0 && `${_getDistance(simulation.positions)} km`}
-            </Typography>
-            <Typography color='textSecondary' className={classes.depositContext}>
-                real distance
-            </Typography>
-            <Grid container spacing={2}>
-                <Grid item>
-                    <Button
-                        variant='contained'
-                        color='secondary'
-                        disabled={!simulation.filename || simulation.positions.length === 0}
-                        onClick={handlePfilter}
-                    >
-                        Particle filter
-                    </Button>
-                </Grid>
+        <Grid container spacing={4}>
+            <Grid item xs={12}>
+                <Title>Trajectory</Title>
+                <Typography component='p' variant='h4'>
+                    {simulation.positions.length > 0 && `${_getDistance(simulation.positions)} km`}
+                </Typography>
+                <Typography color='textSecondary' className={classes.flex}>
+                    real distance
+                </Typography>
+
             </Grid>
-        </React.Fragment>
+            <Grid item xs={12}>
+                <Typography color='textPrimary'>
+                    Particles :&nbsp;
+                    <Typography
+                        component='span'
+                        style={{fontWeight: 'bold'}}
+                    >
+                        {count}
+                    </Typography>
+                </Typography>
+                <Slider
+                    defaultValue={200}
+                    valueLabelDisplay="auto"
+                    step={50}
+                    marks
+                    min={50}
+                    max={1000}
+                    onChange={(event, value) => setCount(value)}
+                />
+            </Grid>
+            <Grid item xs={12}>
+                <Button
+                    variant='contained'
+                    color='secondary'
+                    disabled={!simulation.filename || simulation.positions.length === 0}
+                    onClick={handlePfilter}
+                >
+                    Compute particle filter
+                </Button>
+            </Grid>
+        </Grid>
     );
 }

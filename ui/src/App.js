@@ -1,11 +1,14 @@
 import React from 'react';
 import './App.scss';
 import Dashboard from "./views/Dashboard";
-import {ContextProvider} from 'store/Simulation';
+import {SimulationProvider} from 'store/Simulation';
+import {LoadingProvider} from 'store/Loading';
 
 
 export default () => (
-    <ContextProvider>
-        <Dashboard/>
-    </ContextProvider>
+    <LoadingProvider>
+        <SimulationProvider>
+            <Dashboard/>
+        </SimulationProvider>
+    </LoadingProvider>
 )

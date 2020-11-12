@@ -1,6 +1,6 @@
 import React from 'react';
 import {Title} from 'components';
-import {Context} from 'store/Simulation';
+import {Simulation} from 'store/Simulation';
 import {useTheme} from '@material-ui/core/styles';
 import {Slider} from '@material-ui/core';
 import {ComposedChart, Line, ResponsiveContainer, Scatter, ScatterChart, Tooltip, XAxis, YAxis} from 'recharts';
@@ -16,7 +16,7 @@ function getAverageDeviation(array, index) {  // how particles are far from the 
 }
 
 export default function ParticleFilter() {
-    const {simulation} = React.useContext(Context);
+    const {simulation} = React.useContext(Simulation);
     const theme = useTheme();
 
     const [current, setCurrent] = React.useState(0);

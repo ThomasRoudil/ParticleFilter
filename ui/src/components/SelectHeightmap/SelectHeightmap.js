@@ -1,6 +1,6 @@
 import React from 'react';
 import {api} from 'api';
-import {Context} from "store/Simulation";
+import {Simulation} from "store/Simulation";
 import {FormControl, InputLabel, MenuItem, Select} from '@material-ui/core';
 import {makeStyles} from '@material-ui/core/styles';
 
@@ -13,7 +13,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function SelectHeightmap() {
-    const {simulation, setSimulation} = React.useContext(Context);
+    const {simulation, setSimulation} = React.useContext(Simulation);
     const classes = useStyles();
 
     const [filenames, setFilenames] = React.useState([]);

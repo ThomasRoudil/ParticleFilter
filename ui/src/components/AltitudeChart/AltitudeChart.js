@@ -1,5 +1,5 @@
 import React from 'react';
-import {Context} from 'store/Simulation';
+import {Simulation} from 'store/Simulation';
 import {Title} from 'components';
 import {Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
 import {useTheme} from '@material-ui/core/styles';
@@ -9,7 +9,7 @@ function createData(time, altitude) {
 }
 
 export default function AltitudeChart() {
-    const {simulation} = React.useContext(Context);
+    const {simulation} = React.useContext(Simulation);
     const theme = useTheme();
 
     if (!simulation.altitude_profile) return null;

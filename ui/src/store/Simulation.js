@@ -1,13 +1,12 @@
-import React from 'react';
+import React, {createContext, useState} from 'react';
 
-export const Context = React.createContext({
+export const Simulation = createContext({
     simulation: null,
-    setSimulation: () => {
-    }
+    setSimulation: () => {}
 });
 
 
-export const ContextProvider = (props) => {
+export const SimulationProvider = (props) => {
 
     const setSimulation = simulation => {
         setState({...state, simulation: simulation});
@@ -22,11 +21,11 @@ export const ContextProvider = (props) => {
         setSimulation: setSimulation
     };
 
-    const [state, setState] = React.useState(initState);
+    const [state, setState] = useState(initState);
 
     return (
-        <Context.Provider value={state}>
+        <Simulation.Provider value={state}>
             {props.children}
-        </Context.Provider>
+        </Simulation.Provider>
     )
 };

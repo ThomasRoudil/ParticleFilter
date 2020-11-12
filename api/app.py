@@ -75,12 +75,13 @@ def compute_altitude_profile(args):
 
 @app.route('/particle-filter', methods=['POST'])
 @use_args({
-    'altitude_profile': fields.List(fields.Int, required=True)
+    'altitude_profile': fields.List(fields.Int, required=True),
+    'particles_count': fields.Int(required=True)
 })
 def compute_particle_filter(args):
     altitude_profile = args['altitude_profile']
 
-    N = 400
+    N = args['particles_count']
     particles = np.random.uniform(0, TIME_STEPS, N)
 
     tensor_particles = []

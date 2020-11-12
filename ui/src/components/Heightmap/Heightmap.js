@@ -1,6 +1,6 @@
 import React from 'react';
 import {api} from 'api';
-import {Context} from "store/Simulation";
+import {Simulation} from "store/Simulation";
 import {makeStyles} from '@material-ui/core/styles';
 
 const useStyles = makeStyles(theme => ({
@@ -75,7 +75,7 @@ function _drawLine(canvas, p1, p2, color) {
 }
 
 function Heightmap() {
-    const {simulation, setSimulation} = React.useContext(Context);
+    const {simulation, setSimulation} = React.useContext(Simulation);
     const classes = useStyles();
 
     const canvasRef = React.useRef();
