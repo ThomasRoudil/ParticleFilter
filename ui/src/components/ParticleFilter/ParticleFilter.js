@@ -42,7 +42,7 @@ export default function ParticleFilter() {
             <ResponsiveContainer
                 className={classes.absolute}
                 width='100%'
-                height={270}
+                height={300}
             >
                 <ComposedChart
                     width='100%'
@@ -60,7 +60,9 @@ export default function ParticleFilter() {
                         })}
                         fill="#c51162"
                     />
-                    <ReferenceLine x={current} stroke="red"/>
+                    <ReferenceLine x={current - 10} stroke="red" strokeDasharray="3 3"/>
+                    <ReferenceLine x={current} stroke="red" />
+                    <ReferenceLine x={current + 10} stroke="red" strokeDasharray="3 3"/>
                 </ComposedChart>
             </ResponsiveContainer>
             <Slider
