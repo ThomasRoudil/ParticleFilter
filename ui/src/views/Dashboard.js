@@ -105,17 +105,7 @@ const useStyles = makeStyles((theme) => ({
     container: {
         paddingTop: theme.spacing(4),
         paddingBottom: theme.spacing(4),
-    },
-    paper: {
-        position: 'relative',
-        padding: theme.spacing(2),
-        display: 'flex',
-        overflow: 'hidden',
-        flexDirection: 'column',
-    },
-    fixedHeight: {
-        height: 350,
-    },
+    }
 }));
 
 let box;
@@ -227,7 +217,6 @@ export default function Dashboard() {
     const handleDrawerClose = () => {
         setOpen(false);
     };
-    const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
     return (
         <div className={classes.root}>
@@ -269,7 +258,7 @@ export default function Dashboard() {
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>
-                    <Grid container spacing={3}>
+                    <Grid container spacing={4}>
                         <Grid item xs={12} md={4}>
                             <SelectHeightmap/>
                             <div
@@ -285,8 +274,8 @@ export default function Dashboard() {
                                     onChange={() => setToggleScene(true)}
                                     name="toggle_scene"
                                 />
-
                                 <Heightmap/>
+                                {simulation.positions && simulation.positions.length > 0 && <Actions/>}
                             </div>
                         </Grid>
                         {toggleScene &&
@@ -303,33 +292,12 @@ export default function Dashboard() {
                             />
                         </Grid>}
                         <Grid className={clsx({
-                            [fixedHeightPaper]: true,
                             transition: true,
-                            hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0
-                        })} item xs={12} md={8} lg={9}>
+                            hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0,
+                            relative: true
+                        })} item xs={12} md={8}>
                             <AltitudeChart/>
-                        </Grid>
-                        <Grid
-                            className={clsx({
-                                transition: true,
-                                hide: !simulation.positions || simulation.positions.length === 0
-                            })}
-                            item
-                            xs={12}
-                            md={4}
-                            lg={3}>
-                            <Actions/>
-                        </Grid>
-                        <Grid
-                            className={clsx({
-                                transition: true,
-                                hide: !simulation.tensor_particles || simulation.tensor_particles.length === 0
-                            })}
-                            item
-                            xs={12}
-                            style={{height: 400}}
-                        >
-                            <ParticleFilter/>
+                            {simulation.tensor_particles && <ParticleFilter/>}
                         </Grid>
                     </Grid>
                     <Box pt={4}>

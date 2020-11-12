@@ -17,14 +17,16 @@ export default function AltitudeChart() {
     return (
         <React.Fragment>
             <Title>Altitude profile</Title>
-            <ResponsiveContainer>
+            <ResponsiveContainer
+                width='100%'
+                height={300}
+            >
                 <LineChart
+                    width='100%'
                     data={simulation.altitude_profile.map((altitude, index) => createData(index, altitude))}
                 >
-                    <XAxis stroke={theme.palette.text.secondary} width={40}/>
-                    <YAxis stroke={theme.palette.text.secondary}/>
+                    <YAxis stroke={theme.palette.text.secondary} width={0}/>
                     <Line type="monotone" dataKey="altitude" stroke={theme.palette.primary.main} dot={false}/>
-                    <Tooltip/>
                 </LineChart>
             </ResponsiveContainer>
         </React.Fragment>

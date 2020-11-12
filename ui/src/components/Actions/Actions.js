@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {api} from 'api';
 import {Title} from 'components';
 import {useLoading} from 'hooks';
@@ -13,6 +13,8 @@ const useStyles = makeStyles({
 });
 
 const _getDistance = positions => {
+    if (!document.querySelector('img')) return null;
+    if (!positions || positions.length === 0) return null;
     let clientWidth = document.querySelector('img').clientWidth;
     let clientHeight = document.querySelector('img').clientHeight;
     return (60 / 1081 * Math.sqrt(((positions[1].x - positions[0].x) * 1081 / clientWidth) ** 2 + ((positions[1].y - positions[0].y) * 1081 / clientHeight) ** 2)).toFixed(2);
@@ -41,12 +43,20 @@ export default function Actions() {
             .finally(() => setLoading(false))
     };
 
+    const [distance, setDistance] = useState(simulation.positions
+        ? _getDistance(simulation.positions)
+        : 0
+    );
+    useEffect(() => {
+        setDistance(_getDistance(simulation.positions))
+    }, [setDistance, _getDistance, simulation.positions])
+
     return (
         <Grid container spacing={4}>
             <Grid item xs={12}>
                 <Title>Trajectory</Title>
                 <Typography component='p' variant='h4'>
-                    {simulation.positions.length > 0 && `${_getDistance(simulation.positions)} km`}
+                    {simulation.positions.length > 0 && `${distance} km`}
                 </Typography>
                 <Typography color='textSecondary' className={classes.flex}>
                     real distance
