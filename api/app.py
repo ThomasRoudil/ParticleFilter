@@ -94,6 +94,7 @@ def compute_particle_filter(args):
 
         # Resample
         weights_cumulative = np.cumsum(weights)
+        weights_cumulative[-1] = 1
         u = np.random.uniform(0, 1, N)
         ind1 = np.argsort(np.append(u, weights_cumulative))
         ind = np.array([i for i, x in enumerate(ind1) if x < N]) - np.arange(0, N)
@@ -106,7 +107,8 @@ def compute_particle_filter(args):
         speed = 1
         speed_noise = 0.25 * np.random.uniform(-1, 1, len(particles))
         particles = particles + speed_noise + speed
-        particles = np.array([min(particle, 499) for particle in particles])
+        particles = np.array([particle if particle < TIME_STEPS else np.random.uniform(0, TIME_STEPS)
+                              for particle in particles])
 
     return json.dumps(tensor_particles)
 
