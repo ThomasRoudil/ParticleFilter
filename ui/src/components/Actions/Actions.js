@@ -30,7 +30,7 @@ export default function Actions() {
     const [method, setMethod] = useState('normal');
 
     const handlePfilter = () => {
-        setLoading(true)
+        setLoading(true);
         api.post('/particle-filter', {
             altitude_profile: simulation.altitude_profile,
             particles_count: count,

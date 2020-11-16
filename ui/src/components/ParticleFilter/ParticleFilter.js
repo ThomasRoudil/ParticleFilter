@@ -61,7 +61,7 @@ export default function ParticleFilter() {
                         fill="#c51162"
                     />
                     <ReferenceLine x={current - 2} stroke="red" strokeDasharray="3 3"/>
-                    <ReferenceLine x={current} stroke="red" />
+                    <ReferenceLine x={current} stroke="red"/>
                     <ReferenceLine x={current + 2} stroke="red" strokeDasharray="3 3"/>
                 </ComposedChart>
             </ResponsiveContainer>

@@ -3,7 +3,8 @@ import {Loader} from 'components';
 
 export const LoadingContext = createContext({
     loading: false,
-    setLoading: () => {}
+    setLoading: () => {
+    }
 });
 
 
