@@ -106,6 +106,25 @@ def compute_particle_filter(args):
         elif resampling_method == 'multinomial':
             indexes = np.searchsorted(weights_cumulative, random(len(weights)))
 
+        elif resampling_method == 'residual':
+            N = len(weights)
+            indexes = np.zeros(N, 'i')
+
+            # take int(N*w) copies of each weight
+            num_copies = (N * np.asarray(weights)).astype(int)
+            k = 0
+            for i in range(N):
+                for _ in range(num_copies[i]):  # make n copies
+                    indexes[k] = i
+                    k += 1
+
+            # use multinormial resample on the residual to fill up the rest.
+            residual = weights - num_copies  # get fractional part
+            residual /= sum(residual)  # normalize
+            cumulative_sum = np.cumsum(residual)
+            cumulative_sum[-1] = 1.  # avoid round-off errors: ensures sum is exactly one
+            indexes[k:N] = np.searchsorted(cumulative_sum, random(N - k))
+
         particles = particles[indexes]
 
         # Save particles in tensor
@@ -113,7 +132,7 @@ def compute_particle_filter(args):
 
         # Dynamics
         speed = 1
-        speed_noise = 0.25 * np.random.uniform(-1, 1, len(particles))
+        speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
         particles = particles + speed_noise + speed
         particles = np.array([particle if particle < TIME_STEPS else np.random.uniform(0, TIME_STEPS)
                               for particle in particles])

@@ -21,7 +21,7 @@ function getStandardDeviation(array) {  // how particles are far from each other
 }
 
 function getAverageDeviation(array, index) {  // how particles are far from the plane
-    return array.filter(particle => particle <= index + 10 && particle >= index - 10).length
+    return array.filter(particle => particle <= index + 2 && particle >= index - 2).length
 }
 
 export default function ParticleFilter() {
@@ -50,7 +50,7 @@ export default function ParticleFilter() {
                     <XAxis stroke={theme.palette.text.secondary} type="number" dataKey="x" height={0}
                            domain={[0, 500]}/>
                     <YAxis stroke={theme.palette.text.secondary} type="number" dataKey="y" width={0}/>
-                    <ZAxis range={[15]}/>
+                    <ZAxis range={[8]}/>
                     <Scatter
                         data={simulation.tensor_particles[current] && simulation.tensor_particles[current].map(value => {
                             return {
@@ -60,9 +60,9 @@ export default function ParticleFilter() {
                         })}
                         fill="#c51162"
                     />
-                    <ReferenceLine x={current - 10} stroke="red" strokeDasharray="3 3"/>
+                    <ReferenceLine x={current - 2} stroke="red" strokeDasharray="3 3"/>
                     <ReferenceLine x={current} stroke="red" />
-                    <ReferenceLine x={current + 10} stroke="red" strokeDasharray="3 3"/>
+                    <ReferenceLine x={current + 2} stroke="red" strokeDasharray="3 3"/>
                 </ComposedChart>
             </ResponsiveContainer>
             <Slider
