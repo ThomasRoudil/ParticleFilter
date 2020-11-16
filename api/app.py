@@ -98,7 +98,7 @@ def compute_particle_filter(args):
         weights_cumulative = np.cumsum(weights)
         weights_cumulative[-1] = 1
 
-        if resampling_method == 'normal':
+        if resampling_method == 'none':
             u = np.random.uniform(0, 1, N)
             ind = np.argsort(np.append(u, weights_cumulative))
             indexes = np.array([i for i, x in enumerate(ind) if x < N]) - np.arange(0, N)

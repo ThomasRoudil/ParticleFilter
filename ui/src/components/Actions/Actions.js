@@ -27,7 +27,7 @@ export default function Actions() {
     const {setLoading} = useLoading();
 
     const [count, setCount] = useState(200);
-    const [method, setMethod] = useState('normal');
+    const [method, setMethod] = useState('residual');
 
     const handlePfilter = () => {
         setLoading(true);
