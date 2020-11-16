@@ -101,7 +101,7 @@ export default function Actions() {
                     small
                     variant='outlined'
                 >
-                    {['residual', 'multinomial', 'none'].map(method => (
+                    {['residual', 'multinomial', 'none', 'systematic', 'stratified'].map(method => (
                         <MenuItem key={method} value={method}>{method}</MenuItem>
                     ))}
                 </Select>
