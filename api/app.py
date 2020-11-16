@@ -125,6 +125,37 @@ def compute_particle_filter(args):
             cumulative_sum[-1] = 1.  # avoid round-off errors: ensures sum is exactly one
             indexes[k:N] = np.searchsorted(cumulative_sum, random(N - k))
 
+        elif resampling_method == 'stratified':
+            N = len(weights)
+            # make N subdivisions, and chose a random position within each one
+            positions = (random(N) + range(N)) / N
+
+            indexes = np.zeros(N, 'i')
+            cumulative_sum = np.cumsum(weights)
+            i, j = 0, 0
+            while i < N:
+                if positions[i] < cumulative_sum[j]:
+                    indexes[i] = j
+                    i += 1
+                else:
+                    j += 1
+
+        elif resampling_method == 'systematic':
+            N = len(weights)
+
+            # make N subdivisions, choose positions with a consistent random offset
+            positions = (np.arange(N) + random()) / N
+
+            indexes = np.zeros(N, 'i')
+            cumulative_sum = np.cumsum(weights)
+            i, j = 0, 0
+            while i < N:
+                if positions[i] < cumulative_sum[j]:
+                    indexes[i] = j
+                    i += 1
+                else:
+                    j += 1
+
         particles = particles[indexes]
 
         # Save particles in tensor
