@@ -51,7 +51,8 @@ export default function Actions() {
     );
     useEffect(() => {
         setDistance(_getDistance(simulation.positions))
-    }, [setDistance, _getDistance, simulation.positions])
+
+    }, [setDistance, simulation.positions]);
 
     return (
         <Grid container spacing={4}>
@@ -100,7 +101,7 @@ export default function Actions() {
                     small
                     variant='outlined'
                 >
-                    {['normal', 'multinomial', 'residual'].map(method => (
+                    {['residual', 'multinomial', 'none'].map(method => (
                         <MenuItem key={method} value={method}>{method}</MenuItem>
                     ))}
                 </Select>

@@ -1,7 +1,7 @@
 import React from 'react';
 import {Simulation} from 'store/Simulation';
 import {Title} from 'components';
-import {Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from 'recharts';
+import {Line, LineChart, ResponsiveContainer, YAxis} from 'recharts';
 import {useTheme} from '@material-ui/core/styles';
 
 function createData(time, altitude) {
