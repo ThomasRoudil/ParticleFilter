@@ -26,6 +26,7 @@ function _reset(canvas) {
 }
 
 function _resize(canvas, img) {
+    if (!img) return;
     canvas.width = img.clientWidth;
     canvas.height = img.clientHeight;
 }
@@ -59,6 +60,7 @@ function _drawCursor(canvas, offset) {
 }
 
 function _drawLine(canvas, p1, p2, color) {
+    if (!canvas || !p1 || !p2) return;
     let context = canvas.getContext('2d');
     context.lineWidth = 2;
     context.strokeStyle = color;
