@@ -1,5 +1,6 @@
-import flask
 import json
+
+import flask
 
 
 class APIErrorCodes(object):

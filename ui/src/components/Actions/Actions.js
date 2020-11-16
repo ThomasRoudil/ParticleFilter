@@ -27,10 +27,10 @@ export default function Actions() {
     const {setLoading} = useLoading();
 
     const [count, setCount] = useState(200);
-    const [method, setMethod] = useState('normal');
+    const [method, setMethod] = useState('residual');
 
     const handlePfilter = () => {
-        setLoading(true)
+        setLoading(true);
         api.post('/particle-filter', {
             altitude_profile: simulation.altitude_profile,
             particles_count: count,
@@ -51,7 +51,8 @@ export default function Actions() {
     );
     useEffect(() => {
         setDistance(_getDistance(simulation.positions))
-    }, [setDistance, _getDistance, simulation.positions])
+
+    }, [setDistance, simulation.positions]);
 
     return (
         <Grid container spacing={4}>
@@ -100,7 +101,7 @@ export default function Actions() {
                     small
                     variant='outlined'
                 >
-                    {['normal', 'multinomial', 'residual', 'stratified', 'systematic'].map(method => (
+                    {['residual', 'multinomial', 'none'].map(method => (
                         <MenuItem key={method} value={method}>{method}</MenuItem>
                     ))}
                 </Select>

@@ -2,7 +2,8 @@ import React, {createContext, useState} from 'react';
 
 export const Simulation = createContext({
     simulation: null,
-    setSimulation: () => {}
+    setSimulation: () => {
+    }
 });
 
 

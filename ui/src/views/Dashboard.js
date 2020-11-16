@@ -1,8 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import clsx from 'clsx';
 import {Simulation} from "store/Simulation";
-import {Color3, FreeCamera, HemisphericLight, MeshBuilder, StandardMaterial, Texture, Vector3} from '@babylonjs/core';
-import {Actions, AltitudeChart, Heightmap, Loader, ParticleFilter, Scene, SelectHeightmap} from 'components';
+import {Actions, AltitudeChart, Heightmap, ParticleFilter, SelectHeightmap} from 'components';
 import {mainListItems} from './listItems';
 import {
     AppBar,
@@ -15,7 +14,6 @@ import {
     IconButton,
     Link,
     List,
-    Switch,
     Toolbar,
     Typography
 } from '@material-ui/core';
@@ -108,107 +106,10 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-let box;
-let camera;
-let lines;
-
-const onSceneReady = scene => {
-    scene.clearColor = new Color3(1, 1, 1);
-
-    camera = new FreeCamera("camera", new Vector3(0, 1000, -1), scene);
-    camera.setTarget(Vector3.Zero());
-    camera.lowerBetaLimit = 0.1;
-    camera.upperBetaLimit = (Math.PI / 2) * 0.9;
-    camera.lowerRadiusLimit = 100;
-    camera.upperRadiusLimit = 1500;
-    const canvas = scene.getEngine().getRenderingCanvas();
-    camera.attachControl(canvas, true);
-
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    const light = new HemisphericLight("light", new Vector3(-1, 0, -1), scene);
-    light.intensity = 0.7;
-};
-
-/**
- * Will run on every frame render.
- */
-const onRender = scene => {
-    if (box !== undefined) {
-        const deltaTimeInMillis = scene.getEngine().getDeltaTime();
-
-        const rpm = 10;
-        box.rotation.y += ((rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000));
-    }
-};
-
 
 export default function Dashboard() {
     const {simulation} = React.useContext(Simulation);
     const classes = useStyles();
-
-    const [sceneState, setSceneState] = useState();
-    const [ground, setGround] = React.useState('');
-
-    const [loadingScene, setLoadingScene] = useState(true);
-
-    const [toggleScene, setToggleScene] = useState(false);
-
-    useEffect(() => {
-        if (simulation.filename && toggleScene) {
-            if (ground) {
-                ground.isVisible = false;
-            }
-            setTimeout(() => {
-                let local_ground = MeshBuilder.CreateGroundFromHeightMap("ground", "http://localhost:9000/get-heightmap/" + simulation.filename, {
-                    width: 1081,
-                    height: 1081,
-                    subdivisions: 1200,
-                    minHeight: 0,
-                    maxHeight: 150
-                });
-                if (sceneState) {
-                    let groundMaterial = new StandardMaterial("ground", sceneState);
-                    groundMaterial.diffuseTexture = new Texture("http://localhost:9000/get-colormap/" + simulation.filename, sceneState);
-                    local_ground.material = groundMaterial;
-                }
-                if (lines) lines.isVisible = false;
-                setGround(local_ground)
-            }, 20)
-        }
-    }, [simulation.filename, toggleScene]);
-
-    useEffect(() => {
-        if (simulation.positions && simulation.positions.length > 0 && toggleScene) {
-
-            // Compute babylon space location
-            let clientWidth = document.querySelector('img').clientWidth;
-            let clientHeight = document.querySelector('img').clientHeight;
-            let spaceP1X = 1081 * (simulation.positions[0].x / clientWidth - 0.5);
-            let spaceP1Y = -1081 * (simulation.positions[0].y / clientHeight - 0.5);
-            let spaceP2X = 1081 * (simulation.positions[1].x / clientWidth - 0.5);
-            let spaceP2Y = -1081 * (simulation.positions[1].y / clientHeight - 0.5);
-
-            // Move camera
-            camera.position = new Vector3(spaceP1X, 750, spaceP1Y);
-            let target = new Vector3(spaceP2X, -1000, spaceP2Y);
-            camera.setTarget(target);
-
-            // Draw trajectory line
-            let points = [
-                new Vector3(spaceP1X, 90, spaceP1Y),
-                new Vector3(spaceP2X, 90, spaceP2Y),
-            ];
-            if (lines) lines.isVisible = false;
-            lines = MeshBuilder.CreateDashedLines("lines", {
-                points: points,
-                dashSize: 5,
-                dashNb: 40,
-                gapSize: 5
-            }, sceneState);
-            lines.color = Color3.FromHexString('#6bb3db')
-        }
-    }, [simulation.positions, toggleScene]);
-
 
     const [open, setOpen] = useState(false);
     const handleDrawerOpen = () => {
@@ -264,33 +165,10 @@ export default function Dashboard() {
                             <div
                                 className={clsx({transition: true, hide: !simulation.filename})}
                             >
-                                <Typography
-                                    variant='caption'
-                                >
-                                    ENABLE 3D VIEW
-                                </Typography>
-                                <Switch
-                                    checked={toggleScene}
-                                    onChange={() => setToggleScene(true)}
-                                    name="toggle_scene"
-                                />
                                 <Heightmap/>
                                 {simulation.positions && simulation.positions.length > 0 && <Actions/>}
                             </div>
                         </Grid>
-                        {toggleScene &&
-                        <Grid item xs={12} md={8} className={clsx({transition: true, hide: !simulation.filename})}>
-                            <Loader open={loadingScene}/>
-                            <Scene
-                                antialias
-                                onSceneReady={scene => {
-                                    setSceneState(scene);
-                                    setLoadingScene(false);
-                                    onSceneReady(scene, simulation.filename)
-                                }}
-                                onRender={onRender}
-                            />
-                        </Grid>}
                         <Grid className={clsx({
                             transition: true,
                             hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0,

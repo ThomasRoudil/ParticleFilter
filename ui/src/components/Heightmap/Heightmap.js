@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useLayoutEffect} from 'react';
 import {api} from 'api';
 import {Simulation} from "store/Simulation";
 import {makeStyles} from '@material-ui/core/styles';
@@ -82,6 +82,14 @@ function Heightmap() {
     const imageRef = React.useRef();
 
     let p1, p2;
+
+    useLayoutEffect(() => {
+        let canvas = canvasRef.current;
+        let img = imageRef.current;
+        _resize(canvas, img);
+
+        _drawLine(canvasRef.current, simulation.positions[0], simulation.positions[1], "#6bb3db")
+    }, [simulation.positions]);
 
     if (!simulation.filename) return null;
 

@@ -1,14 +1,21 @@
-import React from 'react';
+import React, {lazy, Suspense} from 'react';
+import {Loader} from 'components';
+
 import './App.scss';
-import Dashboard from "./views/Dashboard";
+
 import {SimulationProvider} from 'store/Simulation';
 import {LoadingProvider} from 'store/Loading';
 
+const Dashboard = lazy(() => import('views/Dashboard'));
+
 
 export default () => (
-    <LoadingProvider>
-        <SimulationProvider>
-            <Dashboard/>
-        </SimulationProvider>
-    </LoadingProvider>
+    <Suspense fallback={<Loader open={true}/>}>
+
+        <LoadingProvider>
+            <SimulationProvider>
+                <Dashboard/>
+            </SimulationProvider>
+        </LoadingProvider>
+    </Suspense>
 )
