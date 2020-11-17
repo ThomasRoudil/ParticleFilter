@@ -1,12 +1,12 @@
 import React from 'react';
 import clsx from 'clsx';
-import {Actions, AltitudeChart, Heightmap, ParticleFilter, SelectHeightmap} from 'components';
+import {Actions, AltitudeChart, Heightmap, ParticleFilter2D, SelectHeightmap} from 'components';
 import {Simulation} from 'store/Simulation';
 
 import {Grid} from '@material-ui/core';
 
 
-function ParticleFilter2D() {
+function ParticleFilter2DView() {
     const {simulation} = React.useContext(Simulation);
 
     return (
@@ -26,10 +26,10 @@ function ParticleFilter2D() {
                 relative: true
             })} item xs={12} md={8}>
                 <AltitudeChart/>
-                {simulation.tensor_particles && <ParticleFilter/>}
+                {simulation.tensor_particles && <ParticleFilter2D/>}
             </Grid>
         </Grid>
     );
 }
 
-export default ParticleFilter2D;
+export default ParticleFilter2DView;

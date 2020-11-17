@@ -89,7 +89,7 @@ export default function Actions({dimensions}) {
                     step={50}
                     marks
                     min={50}
-                    max={1000}
+                    max={10000}
                     onChange={(event, value) => setCount(value)}
                 />
                 <Typography color='textPrimary'>

@@ -1,12 +1,12 @@
 import React from 'react';
 import clsx from 'clsx';
-import {Actions, Heightmap, SelectHeightmap} from 'components';
+import {Actions, Heightmap, ParticleFilter3D, SelectHeightmap} from 'components';
 import {Simulation} from 'store/Simulation';
 
 import {Grid} from '@material-ui/core';
 
 
-function ParticleFilter3D() {
+function ParticleFilter3DView() {
     const {simulation} = React.useContext(Simulation);
 
     return (
@@ -23,6 +23,7 @@ function ParticleFilter3D() {
                 <div
                     className={clsx({transition: true, hide: !simulation.filename})}
                 >
+                    <ParticleFilter3D/>
                     <Heightmap/>
                 </div>
             </Grid>
@@ -30,4 +31,4 @@ function ParticleFilter3D() {
     );
 }
 
-export default ParticleFilter3D;
+export default ParticleFilter3DView;

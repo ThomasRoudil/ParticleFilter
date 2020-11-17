@@ -24,7 +24,7 @@ function getAverageDeviation(array, index) {  // how particles are far from the 
     return array.filter(particle => particle <= index + 2 && particle >= index - 2).length
 }
 
-export default function ParticleFilter() {
+export default function ParticleFilter2DView() {
     const {simulation} = React.useContext(Simulation);
 
     const classes = useStyles();

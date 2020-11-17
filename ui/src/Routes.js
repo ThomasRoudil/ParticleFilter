@@ -4,8 +4,8 @@ import {Redirect, Switch} from 'react-router-dom';
 import {Loader, Route} from 'components';
 import {Layout} from 'layout';
 
-const ParticleFilter2D = lazy(() => import('views/ParticleFilter2D'));
-const ParticleFilter3D = lazy(() => import('views/ParticleFilter3D'));
+const ParticleFilter2D = lazy(() => import('views/ParticleFilter2DView'));
+const ParticleFilter3D = lazy(() => import('views/ParticleFilter3DView'));
 
 const FallBack = ({layout: Layout}) => {
 
