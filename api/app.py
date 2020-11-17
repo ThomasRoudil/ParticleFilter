@@ -3,6 +3,7 @@ import os
 
 import cv2
 import numpy as np
+import random
 from flask import Flask, send_file
 from flask_cors import CORS
 from numpy.random import random
@@ -70,6 +71,18 @@ def compute_altitude_profile(args):
     heightmap = _get_heightmap(filename)
     altitude_profile = [_get_altitude_from_point(point, heightmap) for point in trajectory]
     return json.dumps(altitude_profile)
+
+
+def explore_space_around_trajectory(trajectory):
+    trajectory_increased = []
+    focalization = int(5)
+    bandwidth = []
+    for k in range(4):
+        bandwidth[k] = tuple(random.random()*focalization for x in range(2))
+    [trajectory_increased.extend(point + bandwidth[0]) for point in trajectory]
+    [trajectory_increased.extend(point + bandwidth[1]) for point in trajectory]
+    [trajectory_increased.extend(point + bandwidth[2]) for point in trajectory]
+    [trajectory_increased.extend(point + bandwidth[3]) for point in trajectory]
 
 
 @app.route('/particle-filter', methods=['POST'])
