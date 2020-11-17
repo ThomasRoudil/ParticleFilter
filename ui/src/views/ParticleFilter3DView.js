@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import {Actions, Heightmap, ParticleFilter3D, SelectHeightmap} from 'components';
+import {Actions, AltitudeChart, Heightmap, ParticleFilter3D, SelectHeightmap} from 'components';
 import {Simulation} from 'store/Simulation';
 
 import {Grid} from '@material-ui/core';
@@ -17,7 +17,9 @@ function ParticleFilter3DView() {
                     className={clsx({transition: true, hide: !simulation.filename})}
                 >
                     {simulation.positions && simulation.positions.length > 0 && <Actions dimensions={3}/>}
+                    {simulation.positions && simulation.positions.length > 0 && <AltitudeChart/>}
                 </div>
+
             </Grid>
             <Grid item xs={12} md={8}>
                 <div

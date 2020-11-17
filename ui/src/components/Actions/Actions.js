@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useLayoutEffect, useState} from 'react';
 import {api} from 'api';
 import {Title} from 'components';
 import {useLoading} from 'hooks';
@@ -40,7 +40,8 @@ export default function Actions({dimensions}) {
             : {
                 filename: simulation.filename,
                 altitude_profile: simulation.altitude_profile,
-                particles_count: count
+                particles_count: count,
+                positions: simulation.positions
             };
         api.post(`/particle-filter/simulation/${dimensions}D`, payload)
             .then(response => {
@@ -56,8 +57,8 @@ export default function Actions({dimensions}) {
         ? _getDistance(simulation.positions)
         : 0
     );
-    useEffect(() => {
-        setDistance(_getDistance(simulation.positions))
+    useLayoutEffect(() => {
+        setTimeout(() => setDistance(_getDistance(simulation.positions)), 100)
 
     }, [setDistance, simulation.positions]);
 
@@ -89,10 +90,10 @@ export default function Actions({dimensions}) {
                     step={50}
                     marks
                     min={50}
-                    max={10000}
+                    max={dimensions === 3 ? 5000 : 1000}
                     onChange={(event, value) => setCount(value)}
                 />
-                <Typography color='textPrimary'>
+                {dimensions === 2 && <Typography color='textPrimary'>
                     Resampling :&nbsp;
                     <Typography
                         component='span'
@@ -100,8 +101,8 @@ export default function Actions({dimensions}) {
                     >
                         {method}
                     </Typography>
-                </Typography>
-                <Select
+                </Typography>}
+                {dimensions === 2 && <Select
                     label={method}
                     value={method}
                     onChange={event => setMethod(event.target.value)}
@@ -111,8 +112,7 @@ export default function Actions({dimensions}) {
                     {['residual', 'multinomial', 'none', 'systematic', 'stratified'].map(method => (
                         <MenuItem key={method} value={method}>{method}</MenuItem>
                     ))}
-                </Select>
-
+                </Select>}
             </Grid>
             <Grid item xs={12}>
                 <Button

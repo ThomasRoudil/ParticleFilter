@@ -60,14 +60,14 @@ export default function ParticleFilter3D() {
                                domain={[0, 1081]}/>
                         <YAxis stroke={theme.palette.text.secondary} type="number" dataKey="y" width={0}
                                domain={[0, 1081]}/>
-                        <ZAxis range={[8]}/>
+                        <ZAxis range={[20]}/>
                         <Scatter
                             data={simulation.tensor_particles[current] && simulation.tensor_particles[current].map(particle => {
                                 return {
                                     x: particle[0],
                                     y: particle[1]
                                 }
-                            })}
+                            }).slice(0, 500)}
                             fill="#c51162"
                         />
                     </ScatterChart>

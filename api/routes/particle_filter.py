@@ -125,13 +125,18 @@ def compute_particle_filter_2D(args):
     'filename': fields.Str(required=True),
     'altitude_profile': fields.List(fields.Int, required=True),
     'particles_count': fields.Int(required=True),
+    'positions': fields.List(fields.Dict, required=True)
 })
 def compute_particle_filter_3D(args):
     heightmap = _get_heightmap(args['filename'])
     altitude_profile = args['altitude_profile']
     particles_count = args['particles_count']
+    positions = args['positions']
 
     particles = np.array([tuple(i) for i in np.random.randint(1081, size=(particles_count, 2))])
+
+    p1 = (positions[0]['x'], positions[0]['y'])
+    p2 = (positions[1]['x'], positions[1]['y'])
 
     tensor_particles = []
     for plane_altitude in altitude_profile:
@@ -164,9 +169,11 @@ def compute_particle_filter_3D(args):
         tensor_particles.append(particles)
 
         # Dynamics
-        speed = 1
+        v1 = (p2[0] - p1[0]) / 1081
+        v2 = (p2[1] - p1[1]) / 1081
+        speed = [v1, v2]
         speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
-        particles = particles + np.transpose(np.array([speed_noise, speed_noise])) + speed
+        particles = particles + np.transpose(np.array([speed[0] + speed_noise, speed[1] + speed_noise]))
         particles = np.array([particle if np.all(particle < 1081)
                               else [int(rd.random() * 1081), int(rd.random() * 1081)]
                               for particle in particles])
