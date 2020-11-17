@@ -11,12 +11,12 @@ const useStyles = makeStyles(() => ({
 }));
 
 function Loader(props) {
-    const {open} = props;
+    const {open, ...rest} = props;
     const classes = useStyles();
 
     return (
         <Backdrop className={classes.backdrop} open={open}>
-            <CircularProgress color='secondary'/>
+            <CircularProgress color='secondary' {...rest}/>
         </Backdrop>
     )
 }

@@ -1,8 +1,7 @@
 import React, {useState} from 'react';
+import {useHistory} from 'react-router-dom';
+
 import clsx from 'clsx';
-import {Simulation} from "store/Simulation";
-import {Actions, AltitudeChart, Heightmap, ParticleFilter, SelectHeightmap} from 'components';
-import {mainListItems} from './listItems';
 import {
     AppBar,
     Box,
@@ -10,16 +9,20 @@ import {
     CssBaseline,
     Divider,
     Drawer,
-    Grid,
     IconButton,
     Link,
     List,
+    ListItem,
+    ListItemIcon,
+    ListItemText,
     Toolbar,
     Typography
 } from '@material-ui/core';
+
 import {makeStyles} from '@material-ui/core/styles';
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import MenuIcon from '@material-ui/icons/Menu';
+import {Filter2 as ParticleFilter2DIcon, Filter3 as ParticleFilter3DIcon} from '@material-ui/icons';
 
 function Copyright() {
     return (
@@ -107,9 +110,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 
-export default function Dashboard() {
-    const {simulation} = React.useContext(Simulation);
+function Layout({children}) {
+
     const classes = useStyles();
+
+    const history = useHistory();
 
     const [open, setOpen] = useState(false);
     const handleDrawerOpen = () => {
@@ -152,32 +157,27 @@ export default function Dashboard() {
                     </IconButton>
                 </div>
                 <Divider/>
-                <List>{mainListItems}</List>
+                <List>
+                    <ListItem button onClick={() => history.push('/particle-filter/2D')}>
+                        <ListItemIcon>
+                            <ParticleFilter2DIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary="Particle filter (2D)"/>
+                    </ListItem>
+                    <ListItem button onClick={() => history.push('/particle-filter/3D')}>
+                        <ListItemIcon>
+                            <ParticleFilter3DIcon/>
+                        </ListItemIcon>
+                        <ListItemText primary="Particle filter (3D)"/>
+                    </ListItem>
+                </List>
                 <Divider/>
             </Drawer>
 
             <main className={classes.content}>
                 <div className={classes.appBarSpacer}/>
                 <Container maxWidth="lg" className={classes.container}>
-                    <Grid container spacing={4}>
-                        <Grid item xs={12} md={4}>
-                            <SelectHeightmap/>
-                            <div
-                                className={clsx({transition: true, hide: !simulation.filename})}
-                            >
-                                <Heightmap/>
-                                {simulation.positions && simulation.positions.length > 0 && <Actions/>}
-                            </div>
-                        </Grid>
-                        <Grid className={clsx({
-                            transition: true,
-                            hide: !simulation.altitude_profile || simulation.altitude_profile.length === 0,
-                            relative: true
-                        })} item xs={12} md={8}>
-                            <AltitudeChart/>
-                            {simulation.tensor_particles && <ParticleFilter/>}
-                        </Grid>
-                    </Grid>
+                    {children}
                     <Box pt={4}>
                         <Copyright/>
                     </Box>
@@ -186,3 +186,5 @@ export default function Dashboard() {
         </div>
     );
 }
+
+export default Layout;

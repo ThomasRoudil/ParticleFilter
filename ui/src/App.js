@@ -1,21 +1,25 @@
-import React, {lazy, Suspense} from 'react';
-import {Loader} from 'components';
+import React from 'react';
+import {Router} from 'react-router-dom';
+import * as serviceWorker from './serviceWorker';
+import {createBrowserHistory} from 'history';
 
-import './App.scss';
-
+import Routes from './Routes';
 import {SimulationProvider} from 'store/Simulation';
 import {LoadingProvider} from 'store/Loading';
 
-const Dashboard = lazy(() => import('views/Dashboard'));
+import './App.scss';
+
+const browserHistory = createBrowserHistory();
 
 
 export default () => (
-    <Suspense fallback={<Loader open={true}/>}>
-
-        <LoadingProvider>
-            <SimulationProvider>
-                <Dashboard/>
-            </SimulationProvider>
-        </LoadingProvider>
-    </Suspense>
+    <LoadingProvider>
+        <SimulationProvider>
+            <Router history={browserHistory}>
+                <Routes/>
+            </Router>
+        </SimulationProvider>
+    </LoadingProvider>
 )
+
+serviceWorker.register();
