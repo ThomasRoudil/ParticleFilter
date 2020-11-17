@@ -109,3 +109,54 @@ def compute_particle_filter(args):
                               for particle in particles])
 
     return json.dumps(tensor_particles)
+
+
+@particle_filter.route('/simulation/3D', methods=['POST'])
+@use_args({
+    'particles_count': fields.Int(required=True)
+})
+def compute_particle_filter(args):
+    altitude_profile = args['altitude_profile']
+
+    N = args['particles_count']
+    particles = np.random.uniform(0, NPF.TIME_STEPS, N)
+
+    tensor_particles = []
+    for plane_altitude in altitude_profile:
+        measures = np.array(list(map(lambda x: altitude_profile[int(x)], particles)))
+        weights = 1 / len(measures) * np.ones(len(measures))
+        weights = weights * (
+                (1 / np.sqrt(2 * np.pi)) * np.exp(-((plane_altitude - measures) / max(altitude_profile)) ** 2 / 4))
+        weights = weights / np.sum(weights)
+
+        # Resample (residual)
+        weights_cumulative = np.cumsum(weights)
+        weights_cumulative[-1] = 1
+        N = len(weights)
+        indexes = np.zeros(N, 'i')
+
+        num_copies = (N * np.asarray(weights)).astype(int)
+        k = 0
+        for i in range(N):
+            for _ in range(num_copies[i]):
+                indexes[k] = i
+                k += 1
+
+        residual = weights - num_copies
+        residual /= sum(residual)
+        cumulative_sum = np.cumsum(residual)
+        cumulative_sum[-1] = 1.
+        indexes[k:N] = np.searchsorted(cumulative_sum, random(N - k))
+        particles = particles[indexes]
+
+
+        tensor_particles.append([int(particle) for particle in particles])
+
+        # Dynamics
+        speed = 1
+        speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
+        particles = particles + speed_noise + speed
+        particles = np.array([particle if particle < NPF.TIME_STEPS else np.random.uniform(0, NPF.TIME_STEPS)
+                              for particle in particles])
+
+    return json.dumps(tensor_particles)
