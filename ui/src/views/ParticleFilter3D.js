@@ -20,7 +20,6 @@ function ParticleFilter3D() {
                     {simulation.positions && simulation.positions.length > 0 && <Actions/>}
                 </div>
             </Grid>
-
         </Grid>
     );
 }
