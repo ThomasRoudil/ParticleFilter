@@ -16,7 +16,7 @@ function ParticleFilter3D() {
                 <div
                     className={clsx({transition: true, hide: !simulation.filename})}
                 >
-                    {simulation.positions && simulation.positions.length > 0 && <Actions/>}
+                    {simulation.positions && simulation.positions.length > 0 && <Actions dimensions={3}/>}
                 </div>
             </Grid>
             <Grid item xs={12} md={8}>

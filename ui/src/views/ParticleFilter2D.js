@@ -17,7 +17,7 @@ function ParticleFilter2D() {
                     className={clsx({transition: true, hide: !simulation.filename})}
                 >
                     <Heightmap/>
-                    {simulation.positions && simulation.positions.length > 0 && <Actions/>}
+                    {simulation.positions && simulation.positions.length > 0 && <Actions dimensions={2}/>}
                 </div>
             </Grid>
             <Grid className={clsx({

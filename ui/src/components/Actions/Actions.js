@@ -20,7 +20,7 @@ const _getDistance = positions => {
     return (60 / 1081 * Math.sqrt(((positions[1].x - positions[0].x) * 1081 / clientWidth) ** 2 + ((positions[1].y - positions[0].y) * 1081 / clientHeight) ** 2)).toFixed(2);
 };
 
-export default function Actions() {
+export default function Actions({dimensions}) {
     const {simulation, setSimulation} = React.useContext(Simulation);
     const classes = useStyles();
 
@@ -31,11 +31,18 @@ export default function Actions() {
 
     const handlePfilter = () => {
         setLoading(true);
-        api.post('/particle-filter/simulation/2D', {
-            altitude_profile: simulation.altitude_profile,
-            particles_count: count,
-            resampling_method: method
-        })
+        const payload = dimensions === 2
+            ? {
+                altitude_profile: simulation.altitude_profile,
+                particles_count: count,
+                resampling_method: method
+            }
+            : {
+                filename: simulation.filename,
+                altitude_profile: simulation.altitude_profile,
+                particles_count: count
+            };
+        api.post(`/particle-filter/simulation/${dimensions}D`, payload)
             .then(response => {
                 setSimulation({
                     ...simulation,
