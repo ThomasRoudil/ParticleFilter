@@ -131,7 +131,7 @@ function Heightmap() {
                 y: parseInt(p2.y * 1081 / img.clientHeight)
             }
         ];
-        api.post('/altitude-profile', {
+        api.post('heightmap/altitude-profile', {
             filename: simulation.filename,
             positions: positions
         })
@@ -161,7 +161,7 @@ function Heightmap() {
                 className={classes.img}
                 ref={imageRef}
                 onDragStart={event => event.preventDefault()}
-                src={simulation.filename ? `http://localhost:9000/get-heightmap/${simulation.filename}` : ''}
+                src={simulation.filename ? `http://localhost:9000/v1/heightmap/file/${simulation.filename}` : ''}
                 alt='Heightmap'
             />
             <canvas

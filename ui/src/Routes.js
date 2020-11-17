@@ -10,7 +10,7 @@ const ParticleFilter3D = lazy(() => import('views/ParticleFilter3D'));
 const FallBack = ({layout: Layout}) => {
 
     return <Layout>
-        <Loader open transparent disableShrink/>
+        <Loader open disableShrink/>
     </Layout>
 };
 

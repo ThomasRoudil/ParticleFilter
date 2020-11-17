@@ -23,7 +23,7 @@ export const LoadingProvider = props => {
 
     return (
         <LoadingContext.Provider value={state}>
-            <Loader open={state.loading} full/>
+            <Loader open={state.loading}/>
             {props.children}
         </LoadingContext.Provider>
     )

@@ -31,7 +31,7 @@ export default function Actions() {
 
     const handlePfilter = () => {
         setLoading(true);
-        api.post('/particle-filter', {
+        api.post('/particle-filter/simulation/2D', {
             altitude_profile: simulation.altitude_profile,
             particles_count: count,
             resampling_method: method

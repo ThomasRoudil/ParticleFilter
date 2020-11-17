@@ -18,7 +18,7 @@ function SelectHeightmap() {
 
     const [filenames, setFilenames] = React.useState([]);
     React.useEffect(() => {
-        api.get('/filenames')
+        api.get('/heightmap/filenames')
             .then(response => setFilenames(response.data))
     }, []);
 
