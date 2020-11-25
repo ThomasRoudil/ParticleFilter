@@ -20,7 +20,8 @@ const useStyles = makeStyles({
         height: '816px !important',
         top: 0,
         left: 0,
-        zIndex: 999
+        zIndex: 999,
+        transform: 'rotate(90deg)'
     }
 });
 
@@ -67,7 +68,7 @@ export default function ParticleFilter3D() {
                                     x: particle[0],
                                     y: particle[1]
                                 }
-                            }).slice(0, 500)}
+                            }).slice(0, 1000)}
                             fill="#c51162"
                         />
                     </ScatterChart>

@@ -1,11 +1,11 @@
 import json
 import os
 import random as rd
-import pandas as pd
 
 import cv2
 import numpy as np
-from flask import Blueprint, jsonify
+import pandas as pd
+from flask import Blueprint
 from numpy.random import random
 from webargs import fields
 from webargs.flaskparser import use_args
@@ -169,14 +169,14 @@ def compute_particle_filter_3D(args):
         tensor_particles.append(particles)
 
         # Dynamics
-        v1 = (p2[0] - p1[0]) / 1081
-        v2 = (p2[1] - p1[1]) / 1081
+        v1 = (p2[0] - p1[0]) / NPF.TIME_STEPS
+        v2 = (p2[1] - p1[1]) / NPF.TIME_STEPS
         speed = [v1, v2]
-        speed_noise = 0.5 * np.random.uniform(-1, 1, len(particles))
-        particles = particles + np.transpose(np.array([speed[0] + speed_noise, speed[1] + speed_noise]))
+        speed_noise = 1.5 * np.random.uniform(-1, 1, len(particles))
+        speed_noise_2 = 1.5 * np.random.uniform(-1, 1, len(particles))
+        particles = particles + np.transpose(np.array([speed[1] + speed_noise, speed[0] + speed_noise_2]))
         particles = np.array([particle if np.all(particle < 1081)
                               else [int(rd.random() * 1081), int(rd.random() * 1081)]
                               for particle in particles])
 
     return pd.Series(tensor_particles).to_json(orient='values')
-
