@@ -1,8 +1,11 @@
 bs4==0.0.1
-Flask==1.1.2
+opencv-python==4.6.0.66
+Flask==2.1.0
 Flask-Cors==3.0.8
+pandas==1.5.0
 pymongo==3.10.1
 requests==2.24.0
 requests_oauthlib==1.3.0
+scipy==1.9.1
 uuid==1.30
 webargs==6.1.0
